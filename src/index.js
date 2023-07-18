@@ -45,8 +45,9 @@ function drawGridWithPath2D() {
 }
 
 function highlightPath2D(e) {
-    const x = e.x;
-    const y = e.y;
+    const canvasRect = canvas.getBoundingClientRect();
+    const x = e.x - canvasRect.x;
+    const y = e.y - canvasRect.y;
 
     points.forEach((point) => {
         if(ctx.isPointInPath(point, x, y)) {
