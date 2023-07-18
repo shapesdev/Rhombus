@@ -56,6 +56,9 @@ function drawPoints() {
 
 function getClosestPoint(e) {
     let tempPos = {x: 0, y: 0};
+    tempPos.x = e.x;
+    tempPos.y = e.y;
+    
     let minDistance = 1000000;
     let closestPoint;
 
