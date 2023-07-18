@@ -14,12 +14,14 @@ let cellSize = 100;
 let offset = 100;
 
 let points = [];
+let linePos = {x: 0, y: 0};
 
 // Events
-document.addEventListener('mousedown', highlightPath2D);
+document.addEventListener('mousemove', draw);
+document.addEventListener('mousedown', setPosition);
 
 resize();
-drawGridWithPath2D();
+//drawGridWithPath2D();
 
 function resize() {
     ctx.canvas.width = canvasWidth;
@@ -44,18 +46,26 @@ function drawGridWithPath2D() {
     }
 }
 
-function highlightPath2D(e) {
-    const canvasRect = canvas.getBoundingClientRect();
-    const x = e.x - canvasRect.x;
-    const y = e.y - canvasRect.y;
+function draw(e) {
+    if(e.buttons !== 1) return;
 
-    points.forEach((point) => {
-        if(ctx.isPointInPath(point, x, y)) {
-            ctx.fillStyle = '#39C738';
-            ctx.fill(point);
-        }
-    });
+    ctx.beginPath();
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'green';
+
+    ctx.moveTo(linePos.x, linePos.y);
+    setPosition(e);
+    ctx.lineTo(linePos.x, linePos.y);
+    ctx.stroke();
 }
+
+function setPosition(e) {
+    let canvasRect = canvas.getBoundingClientRect();
+    linePos.x = e.x - canvasRect.left;
+    linePos.y = e.y - canvasRect.top;
+}
+
 
 function getClosestPoint(e) {
     let tempPos = {x: 0, y: 0};
