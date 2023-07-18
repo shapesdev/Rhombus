@@ -17,7 +17,7 @@ let direction = '';
 let oldX = 0;
 let oldY = 0;
 let drawing = false;
-let lineLength = 300;
+let allowedLineLength = 300;
 
 export class Canvas {
     constructor() {
@@ -135,18 +135,18 @@ export class Canvas {
     }
     
     limitLineLength() {
-        if(linePos.x - startPoint.x > lineLength) {
-            linePos.x = startPoint.x + lineLength;
+        if(linePos.x - startPoint.x > allowedLineLength) {
+            linePos.x = startPoint.x + allowedLineLength;
         }
-        else if(startPoint.x - linePos.x > lineLength) {
-            linePos = startPoint.x - lineLength;
+        else if(startPoint.x - linePos.x > allowedLineLength) {
+            linePos = startPoint.x - allowedLineLength;
         }
     
-        if(linePos.y - startPoint.y > lineLength) {
-            linePos.y = startPoint.y + lineLength;
+        if(linePos.y - startPoint.y > allowedLineLength) {
+            linePos.y = startPoint.y + allowedLineLength;
         }
-        else if(startPoint.y - linePos.y > lineLength) {
-            linePos.y = startPoint.y - lineLength;
+        else if(startPoint.y - linePos.y > allowedLineLength) {
+            linePos.y = startPoint.y - allowedLineLength;
         }
     }
     
@@ -160,6 +160,34 @@ export class Canvas {
     }
 
     completeDraw(e) {
+        if(direction == 'East') {
+            let length = linePos.x - startPoint.x;
+            if(length / allowedLineLength > 0.9) {
+                linePos.x = startPoint.x + allowedLineLength;
+                ctx.lineTo(linePos.x, linePos.y);
+                ctx.stroke();
+                console.log('Should finish');
+            }
+            else {
+                console.warn("Too short");
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                this.drawGridWithPath2D();
+            }
+        }
+        if(direction == 'West') {
+            let length = startPoint.x - linePos.x;
+            if(length / allowedLineLength > 0.9) {
+                linePos.x = startPoint.x - allowedLineLength;
+                ctx.lineTo(linePos.x, linePos.y);
+                ctx.stroke();
+                console.log('Should finish');
+            }
+            else {
+                console.warn("Too short");
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                this.drawGridWithPath2D();
+            }
+        }
         this.reset();
     }
 }
