@@ -80,12 +80,16 @@ function setPosition(e) {
     tempPos.y = e.y - canvasRect.top;
 
     if(direction == 'East' || direction == 'West') {
-        linePos.x = tempPos.x;
-        linePos.y = startPoint.y;
+        if(linePos.y != canvasHeight && linePos.y != 0) {
+            linePos.x = tempPos.x;
+            linePos.y = startPoint.y;
+        }
     }
     if(direction == 'South' || direction == 'North') {
-        linePos.x = startPoint.x;
-        linePos.y = tempPos.y;
+        if(linePos.x != canvasWidth && linePos.x != 0) {
+            linePos.x = startPoint.x;
+            linePos.y = tempPos.y;
+        }
     }
 }
 
