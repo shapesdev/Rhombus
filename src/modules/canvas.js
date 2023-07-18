@@ -168,6 +168,21 @@ export class Canvas {
         oldY = 0;
     }
 
+    drawLines() {
+        if(lines.length > 0) {
+            lines.forEach((line) => {
+                ctx.beginPath();
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = 'green';
+            
+                ctx.moveTo(line.startX, line.startY);
+                ctx.lineTo(line.endX, line.endY);
+                ctx.stroke();
+            })
+        }
+    }
+
     completeDraw(e) {
         if(direction in directionMap) {
             const dir = directionMap[direction];
@@ -193,7 +208,7 @@ export class Canvas {
                 console.warn('Line was too short');
                 ctx.clearRect(0, 0, canvasWidth, canvasHeight);
                 this.drawGridWithPath2D();
-                //this.drawLines();
+                this.drawLines();
             }
 
             this.reset();
