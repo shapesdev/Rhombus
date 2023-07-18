@@ -158,4 +158,8 @@ export class Canvas {
         oldX = 0;
         oldY = 0;
     }
+
+    completeDraw(e) {
+        this.reset();
+    }
 }
