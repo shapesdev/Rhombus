@@ -16,7 +16,7 @@ let offset = 100;
 let points = [];
 
 // Events
-document.addEventListener('mousedown', getClosestPoint);
+document.addEventListener('mousedown', highlightPath2D);
 
 resize();
 drawGridWithPath2D();
@@ -33,13 +33,27 @@ function drawGridWithPath2D() {
             path.rect(i * cellSize, j * cellSize, cellSize, cellSize);
             path.closePath();
 
-            ctx.fillStyle = '#39C738';
+            ctx.fillStyle = '#FFFFFF';
             ctx.fill(path);
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#000000';
             ctx.stroke(path);
+
+            points.push(path);
         }
     }
+}
+
+function highlightPath2D(e) {
+    const x = e.x;
+    const y = e.y;
+
+    points.forEach((point) => {
+        if(ctx.isPointInPath(point, x, y)) {
+            ctx.fillStyle = '#39C738';
+            ctx.fill(point);
+        }
+    });
 }
 
 function getClosestPoint(e) {
@@ -58,5 +72,4 @@ function getClosestPoint(e) {
             closestPoint = point;
         }
     });
-    console.log(closestPoint);
 }
