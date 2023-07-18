@@ -4,31 +4,30 @@ canvas.style='border:2px solid #000000';
 document.body.appendChild(canvas);
 let ctx = canvas.getContext('2d');
 
-let canvasWidth = 500;
-let canvasHeight = 500;
+let canvasWidth = 600;
+let canvasHeight = 600;
+
+let gridSize = 5;
+let cellSize = 100;
 
 resize();
-drawCubes();
-setInterval(drawCubes, 250);
+drawGrid();
 
 function resize() {
     ctx.canvas.width = canvasWidth;
     ctx.canvas.height = canvasHeight;
 }
 
-function drawCubes() {
+function drawGrid() {
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    for(let i = 0; i < 5; i++) {
-        ctx.beginPath();
-        ctx.rect(i * 100, i * 100, 100, 100);
-        ctx.strokeStyle = getRandomColor();
-        ctx.stroke();
-    }
-}
+    ctx.strokeStyle = '#000000';
+    ctx.beginPath();
 
-function getRandomColor() {
-    let hexColor = Math.floor(Math.random() * 16777216).toString(16);
-    let randColor = hexColor.padStart(6, '0');
-    return `#${randColor}`;
+    for(let i = 0; i < gridSize; i++) {
+        for(let j = 0; j < gridSize; j++) {
+            ctx.rect(i * cellSize, j * cellSize, cellSize, cellSize);
+        }
+    }
+    ctx.stroke();
 }
