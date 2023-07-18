@@ -13,15 +13,22 @@ let gridSize = 5;
 let cellSize = 100;
 let offset = 100;
 
+// Line drawing
 let points = [];
 let linePos = {x: 0, y: 0};
+let startPoint = {x: 0, y: 0};
+let direction = '';
+let oldX = 0;
+let oldY = 0;
+let drawing = false;
 
 // Events
 document.addEventListener('mousemove', draw);
 document.addEventListener('mousedown', setPosition);
+document.addEventListener('mouseup', reset);
 
 resize();
-//drawGridWithPath2D();
+drawGridWithPath2D();
 
 function resize() {
     ctx.canvas.width = canvasWidth;
@@ -29,25 +36,29 @@ function resize() {
 }
 
 function drawGridWithPath2D() {
-    for(let i = 0; i < gridSize; i++) {
-        for(let j = 0; j < gridSize; j++) {
-            const path = new Path2D();
-            path.rect(i * cellSize, j * cellSize, cellSize, cellSize);
-            path.closePath();
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fill(path);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#000000';
-            ctx.stroke(path);
-
-            points.push(path);
+    for(let i = 0; i <= gridSize; i++) {
+        for(let j = 0; j <= gridSize; j++) {
+            if(i < gridSize && j < gridSize) {
+                const path = new Path2D();
+                path.rect(i * cellSize, j * cellSize, cellSize, cellSize);
+                path.closePath();
+    
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill(path);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#000000';
+                ctx.stroke(path);
+            }
+            points.push({x: i * cellSize, y: j * cellSize});
         }
     }
 }
 
 function draw(e) {
     if(e.buttons !== 1) return;
+
+    setDirection(e);
+    setStartPoint(e);
 
     ctx.beginPath();
     ctx.lineWidth = 5;
@@ -61,26 +72,64 @@ function draw(e) {
 }
 
 function setPosition(e) {
+    let tempPos = {x: 0, y: 0};
     let canvasRect = canvas.getBoundingClientRect();
-    linePos.x = e.x - canvasRect.left;
-    linePos.y = e.y - canvasRect.top;
+    tempPos.x = e.x - canvasRect.left;
+    tempPos.y = e.y - canvasRect.top;
+
+    if(direction == 'East' || direction == 'West') {
+        linePos.x = tempPos.x;
+        linePos.y = startPoint.y;
+    }
+    if(direction == 'South' || direction == 'North') {
+        linePos.x = startPoint.x;
+        linePos.y = tempPos.y;
+    }
 }
 
-
-function getClosestPoint(e) {
-    let tempPos = {x: 0, y: 0};
-    tempPos.x = e.x;
-    tempPos.y = e.y;
-
-    let minDistance = 1000000;
-    let closestPoint;
-
-    points.forEach((point) => {
-        let distance = Math.sqrt(Math.pow((tempPos.x - point.x), 2) + 
-        Math.pow((tempPos.y - point.y), 2));
-        if(distance < minDistance) {
-            minDistance = distance;
-            closestPoint = point;
+function setDirection(e) {
+    if(direction == '') {
+        if(e.pageX > oldX && e.pageY == oldY) {
+            direction = 'East';
         }
-    });
+        else if(e.pageX < oldX && e.pageY == oldY) {
+            direction == 'West';
+        }
+        else if(e.pageX == oldX && e.pageY > oldY) {
+            direction = 'South';
+        }
+        else if(e.pageX == oldX && e.pageY < oldY) {
+            direction = 'North';
+        }
+    }
+
+    oldX = e.pageX;
+    oldY = e.pageY;
+}
+
+function setStartPoint(e) {
+    if(!drawing) {
+        let canvasRect = canvas.getBoundingClientRect();
+        let x = e.x - canvasRect.left;
+        let y = e.y - canvasRect.top;
+        let minDistance = 1000000;
+        let closestPoint;
+
+        points.forEach((point) => {
+            let distance = Math.sqrt(Math.pow((x - point.x), 2) +
+            Math.pow((y - point.y), 2));
+            if(distance < minDistance) {
+                minDistance = distance;
+                closestPoint = point;
+            }
+        });
+        startPoint.x = linePos.x = closestPoint.x;
+        startPoint.y = linePos.y = closestPoint.y;
+        drawing = true;
+    }
+}
+
+function reset() {
+    direction = '';
+    drawing = false;
 }
