@@ -1,3 +1,4 @@
+// Canvas
 let canvas = document.createElement('canvas');
 canvas.id = 'canvas';
 canvas.style='border:2px solid #000000';
@@ -6,12 +7,16 @@ let ctx = canvas.getContext('2d');
 
 let canvasWidth = 700;
 let canvasHeight = 700;
- 
+
+// Grid
 let gridSize = 5;
 let cellSize = 100;
 let offset = 100;
 
 let points = [];
+
+// Events
+document.addEventListener('mousedown', getClosestPoint);
 
 resize();
 drawGrid();
@@ -47,4 +52,20 @@ function drawPoints() {
         ctx.fill();
         ctx.stroke();
     })
+}
+
+function getClosestPoint(e) {
+    let tempPos = {x: 0, y: 0};
+    let minDistance = 1000000;
+    let closestPoint;
+
+    points.forEach((point) => {
+        let distance = Math.sqrt(Math.pow((tempPos.x - point.x), 2) + 
+        Math.pow((tempPos.y - point.y), 2));
+        if(distance < minDistance) {
+            minDistance = distance;
+            closestPoint = point;
+        }
+    });
+    console.log(closestPoint);
 }
