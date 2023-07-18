@@ -21,6 +21,7 @@ let direction = '';
 let oldX = 0;
 let oldY = 0;
 let drawing = false;
+let lineLength = 300;
 
 // Events
 document.addEventListener('mousemove', draw);
@@ -67,6 +68,7 @@ function draw(e) {
 
     ctx.moveTo(linePos.x, linePos.y);
     setPosition(e);
+    limitLineLength();
     ctx.lineTo(linePos.x, linePos.y);
     ctx.stroke();
 }
@@ -129,7 +131,27 @@ function setStartPoint(e) {
     }
 }
 
+function limitLineLength() {
+    if(linePos.x - startPoint.x > lineLength) {
+        linePos.x = startPoint.x + lineLength;
+    }
+    else if(startPoint.x - linePos.x > lineLength) {
+        linePos = startPoint.x - lineLength;
+    }
+
+    if(linePos.y - startPoint.y > lineLength) {
+        linePos.y = startPoint.y + lineLength;
+    }
+    else if(startPoint.y - linePos.y > lineLength) {
+        linePos.y = startPoint.y - lineLength;
+    }
+}
+
 function reset() {
     direction = '';
     drawing = false;
+    linePos = {x: 0, y: 0};
+    startPoint = {x: 0, y: 0};
+    oldX = 0;
+    oldY = 0;
 }
