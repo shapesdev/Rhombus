@@ -8,18 +8,20 @@ let canvasWidth = 500;
 let canvasHeight = 500;
 
 resize();
-drawCube();
+drawCubes();
 
 function resize() {
     ctx.canvas.width = canvasWidth;
     ctx.canvas.height = canvasHeight;
 }
 
-function drawCube() {
+function drawCubes() {
     ctx.lineWidth = 1;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#BBBBBB';
+    ctx.strokeStyle = '#000000';
     ctx.beginPath();
-    ctx.rect(0, 0, 100, 100);
+    for(let i = 0; i < 5; i++) {
+        ctx.rect(i * 100, i * 100, 100, 100);
+    }
     ctx.stroke();
 }
