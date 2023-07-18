@@ -37,17 +37,14 @@ function resize() {
 }
 
 function drawGridWithPath2D() {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000000';
     for(let i = 0; i <= gridSize; i++) {
         for(let j = 0; j <= gridSize; j++) {
             if(i < gridSize && j < gridSize) {
                 const path = new Path2D();
                 path.rect(i * cellSize, j * cellSize, cellSize, cellSize);
                 path.closePath();
-    
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fill(path);
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = '#000000';
                 ctx.stroke(path);
             }
             points.push({x: i * cellSize, y: j * cellSize});
