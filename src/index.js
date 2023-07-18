@@ -9,6 +9,7 @@ let canvasHeight = 500;
 
 resize();
 drawCubes();
+setInterval(drawCubes, 250);
 
 function resize() {
     ctx.canvas.width = canvasWidth;
