@@ -10,14 +10,23 @@ let gridSize = 5;
 let cellSize = 100;
 
 // Line drawing
+const directionMap = {
+    East: {x: 1, y: 0},
+    West: {x: -1, y: 0},
+    South: {x: 0, y: 1},
+    North: {x: 0, y: -1},
+};
+let direction = '';
+
 let points = [];
+let lines = [];
+
 let linePos = {x: 0, y: 0};
 let startPoint = {x: 0, y: 0};
-let direction = '';
 let oldX = 0;
 let oldY = 0;
 let drawing = false;
-let allowedLineLength = 300;
+let lineLength = 300;
 
 export class Canvas {
     constructor() {
@@ -135,18 +144,18 @@ export class Canvas {
     }
     
     limitLineLength() {
-        if(linePos.x - startPoint.x > allowedLineLength) {
-            linePos.x = startPoint.x + allowedLineLength;
+        if(linePos.x - startPoint.x > lineLength) {
+            linePos.x = startPoint.x + lineLength;
         }
-        else if(startPoint.x - linePos.x > allowedLineLength) {
-            linePos = startPoint.x - allowedLineLength;
+        else if(startPoint.x - linePos.x > lineLength) {
+            linePos = startPoint.x - lineLength;
         }
     
-        if(linePos.y - startPoint.y > allowedLineLength) {
-            linePos.y = startPoint.y + allowedLineLength;
+        if(linePos.y - startPoint.y > lineLength) {
+            linePos.y = startPoint.y + lineLength;
         }
-        else if(startPoint.y - linePos.y > allowedLineLength) {
-            linePos.y = startPoint.y - allowedLineLength;
+        else if(startPoint.y - linePos.y > lineLength) {
+            linePos.y = startPoint.y - lineLength;
         }
     }
     
@@ -160,34 +169,34 @@ export class Canvas {
     }
 
     completeDraw(e) {
-        if(direction == 'East') {
-            let length = linePos.x - startPoint.x;
-            if(length / allowedLineLength > 0.9) {
-                linePos.x = startPoint.x + allowedLineLength;
-                ctx.lineTo(linePos.x, linePos.y);
-                ctx.stroke();
-                console.log('Should finish');
+        if(direction in directionMap) {
+            const dir = directionMap[direction];
+            let length;
+
+            if(dir.x !== 0) {
+                length = Math.abs(linePos.x - startPoint.x);
             }
             else {
-                console.warn("Too short");
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                this.drawGridWithPath2D();
+                length = Math.abs(linePos.y - startPoint.y);
             }
-        }
-        if(direction == 'West') {
-            let length = startPoint.x - linePos.x;
-            if(length / allowedLineLength > 0.9) {
-                linePos.x = startPoint.x - allowedLineLength;
+
+            if(length / lineLength > 0.85) {
+                linePos.x = startPoint.x + lineLength * dir.x;
+                linePos.y = startPoint.y + lineLength * dir.y;
+                lines.push({startX: startPoint.x, endX: linePos.x,
+                startY: startPoint.y, endY: linePos.y});
+
                 ctx.lineTo(linePos.x, linePos.y);
                 ctx.stroke();
-                console.log('Should finish');
             }
             else {
-                console.warn("Too short");
+                console.warn('Line was too short');
                 ctx.clearRect(0, 0, canvasWidth, canvasHeight);
                 this.drawGridWithPath2D();
+                //this.drawLines();
             }
+
+            this.reset();
         }
-        this.reset();
     }
 }
