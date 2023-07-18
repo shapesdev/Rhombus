@@ -93,7 +93,7 @@ function setDirection(e) {
             direction = 'East';
         }
         else if(e.pageX < oldX && e.pageY == oldY) {
-            direction == 'West';
+            direction = 'West';
         }
         else if(e.pageX == oldX && e.pageY > oldY) {
             direction = 'South';
