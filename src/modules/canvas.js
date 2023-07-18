@@ -80,12 +80,12 @@ export class Canvas {
         tempPos.x = e.x - canvasRect.left;
         tempPos.y = e.y - canvasRect.top;
     
-        if(direction == 'East' || direction == 'West') {
+        if(['East', 'West'].includes(direction)) {
             if(linePos.y != canvasHeight && linePos.y != 0) {
                 linePos = { x: tempPos.x, y: startPoint.y };
             }
         }
-        if(direction == 'South' || direction == 'North') {
+        if(['South', 'North'].includes(direction)) {
             if(linePos.x != canvasWidth && linePos.x != 0) {
                 linePos = { x: startPoint.x, y: tempPos.y };
             }
