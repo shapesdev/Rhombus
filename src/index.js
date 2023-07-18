@@ -16,12 +16,18 @@ function resize() {
 }
 
 function drawCubes() {
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#000000';
-    ctx.beginPath();
     for(let i = 0; i < 5; i++) {
+        ctx.beginPath();
         ctx.rect(i * 100, i * 100, 100, 100);
+        ctx.strokeStyle = getRandomColor();
+        ctx.stroke();
     }
-    ctx.stroke();
+}
+
+function getRandomColor() {
+    let hexColor = Math.floor(Math.random() * 16777216).toString(16);
+    let randColor = hexColor.padStart(6, '0');
+    return `#${randColor}`;
 }
