@@ -183,7 +183,7 @@ export class Canvas {
         }
     }
 
-    completeDraw(e) {
+    checkLineLength() {
         if(direction in directionMap) {
             const dir = directionMap[direction];
             let length;
@@ -210,8 +210,11 @@ export class Canvas {
                 this.drawGridWithPath2D();
                 this.drawLines();
             }
-
-            this.reset();
         }
+    }
+
+    completeDraw() {
+        this.checkLineLength();
+        this.reset();
     }
 }

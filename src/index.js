@@ -5,7 +5,7 @@ let canvas = new Canvas();
 // Events
 document.addEventListener('mousemove', function(e) {canvas.draw(e)});
 document.addEventListener('mousedown', function(e) {canvas.setPosition(e)});
-document.addEventListener('mouseup', function(e) {canvas.completeDraw(e)});
+document.addEventListener('mouseup', function() {canvas.completeDraw()});
 
 init();
 
