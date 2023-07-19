@@ -84,19 +84,23 @@ export class Canvas {
     }
     
     setPosition(e) {
-        let tempPos = {x: 0, y: 0};
-        let canvasRect = canvas.getBoundingClientRect();
-        tempPos.x = e.x - canvasRect.left;
-        tempPos.y = e.y - canvasRect.top;
+        let tempX = e.x - canvas.getBoundingClientRect().left;
+        let tempY = e.y - canvas.getBoundingClientRect().top;
     
         if(['East', 'West'].includes(direction)) {
-            if(linePos.y != canvasHeight && linePos.y != 0) {
-                linePos = { x: tempPos.x, y: startPoint.y };
+            if(linePos.y != canvasHeight && linePos.y != 0 
+                && ((direction === 'East' && tempX >= linePos.x) 
+                || (direction === 'West' && tempX <= linePos.x))) {
+
+                linePos = { x: tempX, y: startPoint.y };
             }
         }
-        if(['South', 'North'].includes(direction)) {
-            if(linePos.x != canvasWidth && linePos.x != 0) {
-                linePos = { x: startPoint.x, y: tempPos.y };
+        else if(['South', 'North'].includes(direction)) {
+            if(linePos.x != canvasWidth && linePos.x != 0
+                && ((direction === 'South' && tempY >= linePos.y) 
+                || (direction === 'North' && tempY <= linePos.y))) {
+
+                linePos = { x: startPoint.x, y: tempY };
             }
         }
     }
@@ -116,16 +120,14 @@ export class Canvas {
                 direction = 'North';
             }
         }
-    
         oldX = e.pageX;
         oldY = e.pageY;
     }
     
     setStartPoint(e) {
         if(!drawing) {
-            let canvasRect = canvas.getBoundingClientRect();
-            let x = e.x - canvasRect.left;
-            let y = e.y - canvasRect.top;
+            let x = e.x - canvas.getBoundingClientRect().left;
+            let y = e.y - canvas.getBoundingClientRect().top;
             let minDistance = 1000000;
             let closestPoint;
     
