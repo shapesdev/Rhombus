@@ -93,6 +93,7 @@ export class Canvas {
                 || (direction === 'West' && tempX <= linePos.x))) {
 
                 linePos = { x: tempX, y: startPoint.y };
+                console.log(linePos);
             }
         }
         else if(['South', 'North'].includes(direction)) {
@@ -150,7 +151,7 @@ export class Canvas {
             linePos.x = startPoint.x + lineLength;
         }
         else if(startPoint.x - linePos.x > lineLength) {
-            linePos = startPoint.x - lineLength;
+            linePos.x = startPoint.x - lineLength;
         }
     
         if(linePos.y - startPoint.y > lineLength) {
@@ -190,8 +191,11 @@ export class Canvas {
             const dir = directionMap[direction];
             let length;
 
-            if(dir.x !== 0) {
+            if(dir.x != 0) {
+                console.log(linePos.x);
+                console.log(startPoint.x);
                 length = Math.abs(linePos.x - startPoint.x);
+                console.log(length);
             }
             else {
                 length = Math.abs(linePos.y - startPoint.y);
@@ -200,6 +204,7 @@ export class Canvas {
             if(length / lineLength > 0.85) {
                 linePos.x = startPoint.x + lineLength * dir.x;
                 linePos.y = startPoint.y + lineLength * dir.y;
+
                 lines.push({startX: startPoint.x, endX: linePos.x,
                 startY: startPoint.y, endY: linePos.y});
 
