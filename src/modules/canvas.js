@@ -26,7 +26,7 @@ let startPoint = {x: 0, y: 0};
 let oldX = 0;
 let oldY = 0;
 let drawing = false;
-let lineLength = 300;
+let maxLineLength = 300;
 
 export class Canvas {
     constructor() {
@@ -150,28 +150,19 @@ export class Canvas {
     }
     
     limitLineLength() {
-        if(linePos.x - startPoint.x > lineLength) {
-            linePos.x = startPoint.x + lineLength;
+        if(linePos.x - startPoint.x > maxLineLength) {
+            linePos.x = startPoint.x + maxLineLength;
         }
-        else if(startPoint.x - linePos.x > lineLength) {
-            linePos.x = startPoint.x - lineLength;
+        else if(startPoint.x - linePos.x > maxLineLength) {
+            linePos.x = startPoint.x - maxLineLength;
         }
     
-        if(linePos.y - startPoint.y > lineLength) {
-            linePos.y = startPoint.y + lineLength;
+        if(linePos.y - startPoint.y > maxLineLength) {
+            linePos.y = startPoint.y + maxLineLength;
         }
-        else if(startPoint.y - linePos.y > lineLength) {
-            linePos.y = startPoint.y - lineLength;
+        else if(startPoint.y - linePos.y > maxLineLength) {
+            linePos.y = startPoint.y - maxLineLength;
         }
-    }
-    
-    reset() {
-        direction = '';
-        drawing = false;
-        linePos = {x: 0, y: 0};
-        startPoint = {x: 0, y: 0};
-        oldX = 0;
-        oldY = 0;
     }
 
     drawPreviousLines() {
@@ -180,6 +171,11 @@ export class Canvas {
                 this.drawLine(line.start, line.end);
             })
         }
+    }
+
+    completeDraw() {
+        this.checkLineLength();
+        this.reset();
     }
 
     checkLineLength() {
@@ -194,9 +190,9 @@ export class Canvas {
                 length = Math.abs(linePos.y - startPoint.y);
             }
 
-            if(length / lineLength > 0.85) {
-                linePos.x = startPoint.x + lineLength * dir.x;
-                linePos.y = startPoint.y + lineLength * dir.y;
+            if(length / maxLineLength > 0.85) {
+                linePos.x = startPoint.x + maxLineLength * dir.x;
+                linePos.y = startPoint.y + maxLineLength * dir.y;
 
                 let line = {
                     start: {...startPoint},
@@ -215,8 +211,12 @@ export class Canvas {
         }
     }
 
-    completeDraw() {
-        this.checkLineLength();
-        this.reset();
+    reset() {
+        direction = '';
+        drawing = false;
+        linePos = {x: 0, y: 0};
+        startPoint = {x: 0, y: 0};
+        oldX = 0;
+        oldY = 0;
     }
 }
