@@ -64,6 +64,17 @@ export class Canvas {
             }
         }
     }
+
+    drawLine(start, end) {
+        ctx.beginPath();
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'green';
+    
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+    }
     
     draw(e) {
         if(e.buttons !== 1) return;
@@ -170,17 +181,10 @@ export class Canvas {
         oldY = 0;
     }
 
-    drawLines() {
+    drawPreviousLines() {
         if(lines.length > 0) {
             lines.forEach((line) => {
-                ctx.beginPath();
-                ctx.lineWidth = 5;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = 'green';
-            
-                ctx.moveTo(line.startX, line.startY);
-                ctx.lineTo(line.endX, line.endY);
-                ctx.stroke();
+                this.drawLine(line.start, line.end);
             })
         }
     }
@@ -201,9 +205,12 @@ export class Canvas {
                 linePos.x = startPoint.x + lineLength * dir.x;
                 linePos.y = startPoint.y + lineLength * dir.y;
 
-                lines.push({startX: startPoint.x, endX: linePos.x,
-                startY: startPoint.y, endY: linePos.y});
+                let line = {
+                    start: {...startPoint},
+                    end: {...linePos},
+                };
 
+                lines.push(line);
                 ctx.lineTo(linePos.x, linePos.y);
                 ctx.stroke();
             }
@@ -211,7 +218,7 @@ export class Canvas {
                 console.warn('Line was too short');
                 ctx.clearRect(0, 0, canvasWidth, canvasHeight);
                 this.drawGridWithPath2D();
-                this.drawLines();
+                this.drawPreviousLines();
             }
         }
     }
