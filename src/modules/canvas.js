@@ -184,13 +184,14 @@ export class Canvas {
             let length;
 
             if(dir.x !== 0) {
-                length = Math.abs(linePos.x - startPoint.x);
+                length = Math.abs(linePos.x - startPoint.x) / maxLineLength;
             }
             else {
-                length = Math.abs(linePos.y - startPoint.y);
+                length = Math.abs(linePos.y - startPoint.y) / maxLineLength;
             }
 
-            if(length / maxLineLength > 0.85) {
+            if(length > 0.85 && linePos.x <= canvasWidth && linePos.y <= canvasHeight
+                && linePos.x >= 0 && linePos.y >= 0) {
                 linePos.x = startPoint.x + maxLineLength * dir.x;
                 linePos.y = startPoint.y + maxLineLength * dir.y;
 
