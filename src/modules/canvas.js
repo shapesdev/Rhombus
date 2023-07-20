@@ -81,7 +81,6 @@ export class Canvas {
     
     draw(e) {
         if(e.buttons !== 1) return;
-    
         this.setDirection(e);
         this.setStartPoint(e);
         this.setPosition(e);
@@ -205,8 +204,7 @@ export class Canvas {
                 };
 
                 lines.push(line);
-                ctx.lineTo(linePos.x, linePos.y);
-                ctx.stroke();
+                this.drawLine(startPoint, linePos);
             }
             else {
                 console.warn('Line was too short');
