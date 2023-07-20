@@ -65,13 +65,16 @@ export class Canvas {
         }
     }
 
-    drawLine(start, end) {
+    drawLine(start, end, realtime = false) {
         ctx.beginPath();
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
         ctx.strokeStyle = 'green';
     
         ctx.moveTo(start.x, start.y);
+        if(realtime) {
+            this.limitLineLength();
+        }
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
     }
@@ -81,17 +84,8 @@ export class Canvas {
     
         this.setDirection(e);
         this.setStartPoint(e);
-    
-        ctx.beginPath();
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = 'green';
-    
-        ctx.moveTo(linePos.x, linePos.y);
         this.setPosition(e);
-        this.limitLineLength();
-        ctx.lineTo(linePos.x, linePos.y);
-        ctx.stroke();
+        this.drawLine(startPoint, linePos, true);
     }
     
     setPosition(e) {
