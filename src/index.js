@@ -1,6 +1,6 @@
 import { Canvas } from "./modules/canvas.js";
 
-let canvas = new Canvas();
+const canvas = new Canvas();
 
 // Events
 document.addEventListener('mousemove', function(e) {canvas.draw(e)});
