@@ -208,8 +208,8 @@ export class Canvas {
                     linePos.y = startPoint.y + maxLineLength * dir.y;
                     
                     lines.push(line);
-                    this.disablePoints(line);
                     this.drawLine(startPoint, linePos);
+                    this.disablePoints(line);
                 }
                 else {
                     console.warn('Line was too short');
@@ -224,6 +224,15 @@ export class Canvas {
         if(isHorizontal) {
             for(let i = line.start.x + cellSize; i < line.end.x; i+=cellSize) {
                 let item = points.find(item => item.x == i && item.y == line.start.y);
+                if(!item.isAvailable) {
+                    console.log('Should not allow to draw');
+                }
+                item.isAvailable = false;
+            }
+        }
+        else {
+            for(let i = line.start.y + cellSize; i < line.end.y; i+=cellSize) {
+                let item = points.find(item => item.x == line.start.x && item.y == i);
                 if(!item.isAvailable) {
                     console.log('Should not allow to draw');
                 }
