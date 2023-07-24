@@ -2,11 +2,11 @@
 let canvas;
 let ctx;
 
-let canvasWidth = 500;
-let canvasHeight = 500;
+let canvasWidth = 700;
+let canvasHeight = 700;
 
 // Grid
-let gridSize = 5;
+let gridSize = 7;
 let cellSize = 100;
 
 // Line drawing
@@ -26,6 +26,7 @@ let startPoint = {x: 0, y: 0};
 let oldX = 0;
 let oldY = 0;
 let drawing = false;
+let overlap = false;
 let maxLineLength = 300;
 
 export class Canvas {
@@ -78,6 +79,14 @@ export class Canvas {
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
     }
+
+    drawPreviousLines() {
+        if(lines.length > 0) {
+            lines.forEach((line) => {
+                this.drawLine(line.start, line.end);
+            })
+        }
+    }
     
     draw(e) {
         if(e.buttons !== 1) return;
@@ -88,8 +97,8 @@ export class Canvas {
     }
     
     setPosition(e) {
-        let tempX = e.x - canvas.getBoundingClientRect().left;
-        let tempY = e.y - canvas.getBoundingClientRect().top;
+        const tempX = e.x - canvas.getBoundingClientRect().left;
+        const tempY = e.y - canvas.getBoundingClientRect().top;
     
         if(['East', 'West'].includes(direction)) {
             if(linePos.y != canvasHeight && linePos.y != 0 
@@ -130,8 +139,8 @@ export class Canvas {
     
     setStartPoint(e) {
         if(!drawing) {
-            let x = e.x - canvas.getBoundingClientRect().left;
-            let y = e.y - canvas.getBoundingClientRect().top;
+            const x = e.x - canvas.getBoundingClientRect().left;
+            const y = e.y - canvas.getBoundingClientRect().top;
             let minDistance = 1000000;
             let closestPoint;
     
@@ -165,51 +174,82 @@ export class Canvas {
         }
     }
 
-    drawPreviousLines() {
-        if(lines.length > 0) {
-            lines.forEach((line) => {
-                this.drawLine(line.start, line.end);
-            })
-        }
-    }
-
     completeDraw() {
-        this.checkLineLength();
+        this.validateLine();
         this.reset();
     }
 
-    checkLineLength() {
-        if(direction in directionMap) {
-            const dir = directionMap[direction];
-            let length;
+    validateLine() {
+        const line = {
+            start: {...startPoint},
+            end: {...linePos},
+        };
 
-            if(dir.x !== 0) {
-                length = Math.abs(linePos.x - startPoint.x) / maxLineLength;
-            }
-            else {
-                length = Math.abs(linePos.y - startPoint.y) / maxLineLength;
-            }
-
-            if(length > 0.85 && linePos.x <= canvasWidth && linePos.y <= canvasHeight
-                && linePos.x >= 0 && linePos.y >= 0) {
-                linePos.x = startPoint.x + maxLineLength * dir.x;
-                linePos.y = startPoint.y + maxLineLength * dir.y;
-
-                let line = {
-                    start: {...startPoint},
-                    end: {...linePos},
-                };
-
-                lines.push(line);
-                this.drawLine(startPoint, linePos);
-            }
-            else {
-                console.warn('Line was too short');
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                this.drawGridWithPath2D();
-                this.drawPreviousLines();
+        if(this.isLineOverlapping(line)) {
+            console.warn('Line is overlapping');
+            this.resetGrid();
+        }
+        else {
+            if(direction in directionMap) {
+                const dir = directionMap[direction];
+                let length;
+    
+                if(dir.x !== 0) {
+                    length = Math.abs(linePos.x - startPoint.x) / maxLineLength;
+                }
+                else {
+                    length = Math.abs(linePos.y - startPoint.y) / maxLineLength;
+                }
+    
+                if(length > 0.85 && linePos.x <= canvasWidth && linePos.y <= canvasHeight
+                    && linePos.x >= 0 && linePos.y >= 0) {
+                    linePos.x = startPoint.x + maxLineLength * dir.x;
+                    linePos.y = startPoint.y + maxLineLength * dir.y;
+    
+                    lines.push(line);
+                    this.drawLine(startPoint, linePos);
+                }
+                else {
+                    console.warn('Line was too short');
+                    this.resetGrid();
+                }
             }
         }
+    }
+
+    isLineOverlapping(cur) {
+        return lines.some((line) => {
+            if(Math.min(cur.start.x, cur.end.x) < Math.max(line.end.x, line.start.x)
+                && Math.max(cur.start.x, cur.end.x) > Math.min(line.start.x, line.end.x)
+                && cur.start.y == line.start.y && cur.end.y == line.end.y) {
+                console.log('Horizontal Collinear Overlap');
+            }
+            else if(Math.min(cur.start.y, cur.end.y) < Math.max(line.end.y, line.start.y)
+                && Math.max(cur.start.y, cur.end.y) > Math.min(line.start.y, line.end.y)
+                && cur.start.x == line.start.x && cur.end.x == line.end.x) {
+                console.log('Vertical Collinear Overlap');
+            }
+
+            let isHorizontal = cur.start.y == cur.end.y ? true : false;
+            if(isHorizontal) {
+                //console.log(`Likely1 the intersection point is ${line.start.x} ${cur.start.y}`)
+                if(Math.max(line.start.y, line.end.y) > cur.start.y
+                    && Math.min(line.start.y, line.end.y) < cur.start.y
+                    && line.start.x != cur.start.x && line.end.x != cur.end.x) {
+                    console.log("Horizontal Overlap");
+                }
+            }
+            else {
+
+            }
+            return false;
+          });
+    }
+
+    resetGrid() {
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        this.drawGridWithPath2D();
+        this.drawPreviousLines();
     }
 
     reset() {
