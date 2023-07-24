@@ -1,2 +1,2 @@
 # Rhombus
-2d territory claiming game
+2d territory claiming browser game
