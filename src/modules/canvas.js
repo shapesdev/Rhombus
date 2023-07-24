@@ -224,6 +224,10 @@ export class Canvas {
         let p1, p2;
         let dir;
 
+        // Update if touching edges
+        this.updatePointAvailability(this.points.find(p => p.x == line.start.x && p.y == line.start.y));
+        this.updatePointAvailability(this.points.find(p => p.x == line.end.x && p.y == line.end.y));
+
         if(isHorizontal) {
             dir = line.start.x < line.end.x ? 1 : -1;
             const xOffset = this.cellSize * dir;
@@ -248,11 +252,16 @@ export class Canvas {
             this.lines.pop();
         }
 
-        let endingPoint = this.points.find(p => p.x = line.end.x && p.y == line.end.y);
-        console.log(endingPoint);
+        let endingPoint = this.points.find(p => p.x == line.end.x && p.y == line.end.y);
         this.hasLegalMoves(endingPoint);
 
         this.resetGrid();
+    }
+
+    updatePointAvailability(point) {
+        if (point.x === 0 || point.y === 0 || point.x === this.canvasWidth || point.y === this.canvasHeight) {
+            point.isAvailable = false;
+        }
     }
 
     hasLegalMoves(point) {
@@ -260,9 +269,6 @@ export class Canvas {
         let count = 0;
         for(const direction in directionMap) {
             const {x, y} = directionMap[direction];
-            console.log(point.x);
-/*             console.log(this.maxLineLength * x);
-            console.log(point.x + (this.maxLineLength * x)); */
             let pos = {x: point.x + (this.maxLineLength * x),
                      y: point.y + (this.maxLineLength * y)};
             let move = this.points.find(p => p.x == pos.x && p.y == pos.y);
