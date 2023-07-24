@@ -51,7 +51,7 @@ export class Canvas {
     }
     
     drawGridWithPath2D() {
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 0.2;
         ctx.strokeStyle = '#000000';
         const pointSize = points.length;
 
@@ -75,7 +75,7 @@ export class Canvas {
         ctx.beginPath();
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = 'green';
+        ctx.strokeStyle = 'black';
     
         ctx.moveTo(start.x, start.y);
         if(realtime) {
@@ -190,61 +190,55 @@ export class Canvas {
             end: {...linePos},
         };
 
-/*         if(this.isLineOverlapping(line)) {
-            console.warn('Line is overlapping');
-            this.resetGrid();
-        } */
-        {
-            if(direction in directionMap) {
-                const dir = directionMap[direction];
-                let length;
-    
-                if(dir.x !== 0) {
-                    length = Math.abs(linePos.x - startPoint.x) / maxLineLength;
-                }
-                else {
-                    length = Math.abs(linePos.y - startPoint.y) / maxLineLength;
-                }
-    
-                if(length > 0.85 && linePos.x <= canvasWidth && linePos.y <= canvasHeight
-                    && linePos.x >= 0 && linePos.y >= 0) {
-                    linePos.x = startPoint.x + maxLineLength * dir.x;
-                    linePos.y = startPoint.y + maxLineLength * dir.y;
-                    
-                    lines.push(line);
-                    this.updateDrawPoints(line);
-                }
-                else {
-                    console.warn('Line was too short');
-                    this.resetGrid();
-                }
+        if(direction in directionMap) {
+            const dir = directionMap[direction];
+            let length;
+
+            if(dir.x !== 0) {
+                length = Math.abs(linePos.x - startPoint.x) / maxLineLength;
+            }
+            else {
+                length = Math.abs(linePos.y - startPoint.y) / maxLineLength;
+            }
+
+            if(length > 0.85 && linePos.x <= canvasWidth && linePos.y <= canvasHeight
+                && linePos.x >= 0 && linePos.y >= 0) {
+                linePos.x = startPoint.x + maxLineLength * dir.x;
+                linePos.y = startPoint.y + maxLineLength * dir.y;
+                
+                lines.push(line);
+                this.updateDrawPoints(line);
+            }
+            else {
+                console.warn('Line was too short');
+                this.resetGrid();
             }
         }
     }
 
     updateDrawPoints(line) {
         const isHorizontal = line.start.y == line.end.y ? true : false;
-        let point1, point2;
+        let p1, p2;
         let dir;
 
         if(isHorizontal) {
             dir = line.start.x < line.end.x ? 1 : -1;
-            point1 = points.find(p => p.x == line.start.x + cellSize * dir 
+            p1 = points.find(p => p.x == line.start.x + cellSize * dir 
                 && p.y == line.start.y);
-            point2 = points.find(p => p.x == line.start.x + cellSize * 2 * dir 
+            p2 = points.find(p => p.x == line.start.x + cellSize * 2 * dir 
                 && p.y == line.start.y);
         }
         else {
             dir = line.start.y < line.end.y ? 1 : -1;
-            point1 = points.find(p => p.x == line.start.x 
+            p1 = points.find(p => p.x == line.start.x 
                 && p.y == line.start.y + cellSize * dir);
-            point2 = points.find(p => p.x == line.start.x 
+            p2 = points.find(p => p.x == line.start.x 
                 && p.y == line.start.y + 2 * cellSize * dir);
         }
 
-        if(point1.isAvailable && point2.isAvailable) {
-            point1.isAvailable = false;
-            point2.isAvailable = false;
+        if(p1.isAvailable && p2.isAvailable) {
+            p1.isAvailable = false;
+            p2.isAvailable = false;
         }
         else {
             console.log('NO DRAWING HERE BUDDY');
@@ -253,35 +247,6 @@ export class Canvas {
 
         this.resetGrid();
     }
-
-/*     isLineOverlapping(cur) {
-        return lines.some((line) => {
-            if(Math.min(cur.start.x, cur.end.x) < Math.max(line.end.x, line.start.x)
-                && Math.max(cur.start.x, cur.end.x) > Math.min(line.start.x, line.end.x)
-                && cur.start.y == line.start.y && cur.end.y == line.end.y) {
-                console.log('Horizontal Collinear Overlap');
-            }
-            else if(Math.min(cur.start.y, cur.end.y) < Math.max(line.end.y, line.start.y)
-                && Math.max(cur.start.y, cur.end.y) > Math.min(line.start.y, line.end.y)
-                && cur.start.x == line.start.x && cur.end.x == line.end.x) {
-                console.log('Vertical Collinear Overlap');
-            }
-
-            let isHorizontal = cur.start.y == cur.end.y ? true : false;
-            if(isHorizontal) {
-                //console.log(`Likely1 the intersection point is ${line.start.x} ${cur.start.y}`)
-                if(Math.max(line.start.y, line.end.y) > cur.start.y
-                    && Math.min(line.start.y, line.end.y) < cur.start.y
-                    && line.start.x != cur.start.x && line.end.x != cur.end.x) {
-                    console.log("Horizontal Overlap");
-                }
-            }
-            else {
-
-            }
-            return false;
-          });
-    } */
 
     resetGrid() {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
