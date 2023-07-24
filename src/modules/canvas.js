@@ -1,9 +1,8 @@
-// Line drawing
 const directionMap = {
-    East: {x: 1, y: 0},
-    West: {x: -1, y: 0},
-    South: {x: 0, y: 1},
     North: {x: 0, y: -1},
+    East: {x: 1, y: 0},
+    South: {x: 0, y: 1},
+    West: {x: -1, y: 0},
 };
 
 export class Canvas {
@@ -245,11 +244,33 @@ export class Canvas {
             p2.isAvailable = false;
         }
         else {
-            console.warn('NO DRAWING HERE BUDDY');
+            console.warn('No drawing here, buddy');
             this.lines.pop();
         }
 
+        let endingPoint = this.points.find(p => p.x = line.end.x && p.y == line.end.y);
+        console.log(endingPoint);
+        this.hasLegalMoves(endingPoint);
+
         this.resetGrid();
+    }
+
+    hasLegalMoves(point) {
+        // North -> East -> South -> West
+        let count = 0;
+        for(const direction in directionMap) {
+            const {x, y} = directionMap[direction];
+            console.log(point.x);
+/*             console.log(this.maxLineLength * x);
+            console.log(point.x + (this.maxLineLength * x)); */
+            let pos = {x: point.x + (this.maxLineLength * x),
+                     y: point.y + (this.maxLineLength * y)};
+            let move = this.points.find(p => p.x == pos.x && p.y == pos.y);
+            if(move && move.isAvailable) {
+                count++;
+            }
+        }
+        console.log(count);
     }
 
     resetGrid() {
