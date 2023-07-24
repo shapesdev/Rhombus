@@ -1,14 +1,3 @@
-// Canvas
-let canvas;
-let ctx;
-
-let canvasWidth = 700;
-let canvasHeight = 700;
-
-// Grid
-let gridSize = 7;
-let cellSize = 100;
-
 // Line drawing
 const directionMap = {
     East: {x: 1, y: 0},
@@ -16,55 +5,60 @@ const directionMap = {
     South: {x: 0, y: 1},
     North: {x: 0, y: -1},
 };
-let direction = '';
-
-let points = [];
-let lines = [];
-
-let linePos = {x: 0, y: 0};
-let startPoint = {x: 0, y: 0};
-let oldX = 0;
-let oldY = 0;
-let drawing = false;
-let overlap = false;
-let maxLineLength = 300;
 
 export class Canvas {
     constructor() {
-
+        this.canvas = null;
+        this.ctx = null;
+        this.canvasWidth = 700;
+        this.canvasHeight = 700;
+        this.gridSize = 7;
+        this.cellSize = 100;
+        this.maxLineLength = 300;
+        this.points = [];
+        this.lines = [];
+        this.linePos = { x: 0, y: 0 };
+        this.startPoint = { x: 0, y: 0 };
+        this.oldX = 0;
+        this.oldY = 0;
+        this.drawing = false;
+        this.direction = '';
     }
 
     init() {
-        canvas = document.createElement('canvas');
-        canvas.id = 'canvas';
-        canvas.style= 'border:2px solid #000000';
-        document.body.appendChild(canvas);
-        ctx = canvas.getContext('2d');
-
+        this.createCanvas();
         this.resize();
         this.drawGridWithPath2D();
     }
 
+    createCanvas() {
+        this.canvas = document.createElement('canvas');
+        this.canvas.id = 'canvas';
+        this.canvas.style= 'border:2px solid #000000';
+        document.body.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext('2d');
+    }
+
     resize() {
-        ctx.canvas.width = canvasWidth;
-        ctx.canvas.height = canvasHeight;
+        this.ctx.canvas.width = this.canvasWidth;
+        this.ctx.canvas.height = this.canvasHeight;
     }
     
     drawGridWithPath2D() {
-        ctx.lineWidth = 0.2;
-        ctx.strokeStyle = '#000000';
-        const pointSize = points.length;
+        this.ctx.lineWidth = 0.2;
+        this.ctx.strokeStyle = '#000000';
+        const pointsCollectionEmpty = this.points.length === 0;
 
-        for(let i = 0; i <= gridSize; i++) {
-            for(let j = 0; j <= gridSize; j++) {
-                if(i < gridSize && j < gridSize) {
+        for(let i = 0; i <= this.gridSize; i++) {
+            for(let j = 0; j <= this.gridSize; j++) {
+                if(i < this.gridSize && j < this.gridSize) {
                     const path = new Path2D();
-                    path.rect(i * cellSize, j * cellSize, cellSize, cellSize);
+                    path.rect(i * this.cellSize, j * this.cellSize, this.cellSize, this.cellSize);
                     path.closePath();
-                    ctx.stroke(path);
+                    this.ctx.stroke(path);
                 }
-                if(pointSize == 0) {
-                    points.push({x: i * cellSize, y: j * cellSize, isAvailable: true});
+                if(pointsCollectionEmpty) {
+                    this.points.push({x: i * this.cellSize, y: j * this.cellSize, isAvailable: true});
                 }
             }
         }
@@ -72,22 +66,25 @@ export class Canvas {
     }
 
     drawLine(start, end, realtime = false) {
+        const {ctx} = this;
+
         ctx.beginPath();
         ctx.lineWidth = 5;
         ctx.lineCap = 'round';
         ctx.strokeStyle = 'black';
-    
         ctx.moveTo(start.x, start.y);
+
         if(realtime) {
             this.limitLineLength();
         }
+
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
     }
 
     drawPreviousLines() {
-        if(lines.length > 0) {
-            lines.forEach((line) => {
+        if(this.lines.length > 0) {
+            this.lines.forEach((line) => {
                 this.drawLine(line.start, line.end);
             })
         }
@@ -98,58 +95,63 @@ export class Canvas {
         this.setDirection(e);
         this.setStartPoint(e);
         this.setPosition(e);
-        this.drawLine(startPoint, linePos, true);
+        this.drawLine(this.startPoint, this.linePos, true);
     }
     
     setPosition(e) {
-        const tempX = e.x - canvas.getBoundingClientRect().left;
-        const tempY = e.y - canvas.getBoundingClientRect().top;
+        const x = e.x - this.canvas.getBoundingClientRect().left;
+        const y = e.y - this.canvas.getBoundingClientRect().top;
+        const { direction, canvasHeight, canvasWidth, linePos, startPoint } = this;
     
         if(['East', 'West'].includes(direction)) {
             if(linePos.y != canvasHeight && linePos.y != 0 
-                && ((direction === 'East' && tempX >= linePos.x) 
-                || (direction === 'West' && tempX <= linePos.x))) {
+                && ((direction === 'East' && x >= linePos.x) 
+                || (direction === 'West' && x <= linePos.x))) {
 
-                linePos = { x: tempX, y: startPoint.y };
+                    linePos = { x: x, y: startPoint.y };
             }
         }
         else if(['South', 'North'].includes(direction)) {
             if(linePos.x != canvasWidth && linePos.x != 0
-                && ((direction === 'South' && tempY >= linePos.y) 
-                || (direction === 'North' && tempY <= linePos.y))) {
+                && ((direction === 'South' && y >= linePos.y) 
+                || (direction === 'North' && y <= linePos.y))) {
 
-                linePos = { x: startPoint.x, y: tempY };
+                linePos = { x: startPoint.x, y: y };
             }
         }
     }
     
     setDirection(e) {
-        if(direction == '') {
-            if(e.pageX > oldX && e.pageY == oldY) {
-                direction = 'East';
+        if(this.direction == '') {
+            const {pageX, pageY} = e;
+            let x = this.oldX;
+            let y = this.oldY;
+
+            if(pageX > x && pageY == y) {
+                this.direction = 'East';
             }
-            else if(e.pageX < oldX && e.pageY == oldY) {
-                direction = 'West';
+            else if(pageX < x && pageY == y) {
+                this.direction = 'West';
             }
-            else if(e.pageX == oldX && e.pageY > oldY) {
-                direction = 'South';
+            else if(pageX == x && pageY > y) {
+                this.direction = 'South';
             }
-            else if(e.pageX == oldX && e.pageY < oldY) {
-                direction = 'North';
+            else if(pageX == x && pageY < y) {
+                this.direction = 'North';
             }
         }
-        oldX = e.pageX;
-        oldY = e.pageY;
+        this.oldX = e.pageX;
+        this.oldY = e.pageY;
     }
     
     setStartPoint(e) {
-        if(!drawing) {
-            const x = e.x - canvas.getBoundingClientRect().left;
-            const y = e.y - canvas.getBoundingClientRect().top;
+        if(!this.drawing) {
+            const x = e.x - this.canvas.getBoundingClientRect().left;
+            const y = e.y - this.canvas.getBoundingClientRect().top;
             let minDistance = 1000000;
             let closestPoint;
     
-            points.forEach((point) => {
+            this.points.forEach((point) => {
                 let distance = Math.sqrt(Math.pow((x - point.x), 2) +
                 Math.pow((y - point.y), 2));
                 if(distance < minDistance) {
@@ -157,24 +159,24 @@ export class Canvas {
                     closestPoint = point;
                 }
             });
-            startPoint.x = linePos.x = closestPoint.x;
-            startPoint.y = linePos.y = closestPoint.y;
-            drawing = true;
+            this.startPoint.x = this.linePos.x = closestPoint.x;
+            this.startPoint.y = this.linePos.y = closestPoint.y;
+            this.drawing = true;
         }
     }
     
     limitLineLength() {
-        if(linePos.x - startPoint.x > maxLineLength) {
+        const { linePos, startPoint, maxLineLength } = this;
+
+        if (linePos.x - startPoint.x > maxLineLength) {
             linePos.x = startPoint.x + maxLineLength;
-        }
-        else if(startPoint.x - linePos.x > maxLineLength) {
+        } else if (startPoint.x - linePos.x > maxLineLength) {
             linePos.x = startPoint.x - maxLineLength;
         }
-    
-        if(linePos.y - startPoint.y > maxLineLength) {
+
+        if (linePos.y - startPoint.y > maxLineLength) {
             linePos.y = startPoint.y + maxLineLength;
-        }
-        else if(startPoint.y - linePos.y > maxLineLength) {
+        } else if (startPoint.y - linePos.y > maxLineLength) {
             linePos.y = startPoint.y - maxLineLength;
         }
     }
@@ -185,6 +187,8 @@ export class Canvas {
     }
 
     validateLine() {
+        const {direction, linePos, startPoint, maxLineLength, canvasWidth, canvasHeight} = this;
+
         const line = {
             start: {...startPoint},
             end: {...linePos},
@@ -206,7 +210,7 @@ export class Canvas {
                 linePos.x = startPoint.x + maxLineLength * dir.x;
                 linePos.y = startPoint.y + maxLineLength * dir.y;
                 
-                lines.push(line);
+                this.lines.push(line);
                 this.updateDrawPoints(line);
             }
             else {
@@ -217,23 +221,23 @@ export class Canvas {
     }
 
     updateDrawPoints(line) {
-        const isHorizontal = line.start.y == line.end.y ? true : false;
+        const isHorizontal = line.start.y === line.end.y;
         let p1, p2;
         let dir;
 
         if(isHorizontal) {
             dir = line.start.x < line.end.x ? 1 : -1;
-            p1 = points.find(p => p.x == line.start.x + cellSize * dir 
-                && p.y == line.start.y);
-            p2 = points.find(p => p.x == line.start.x + cellSize * 2 * dir 
-                && p.y == line.start.y);
+            const xOffset = this.cellSize * dir;
+
+            p1 = this.points.find(p => p.x == line.start.x + xOffset && p.y == line.start.y);
+            p2 = this.points.find(p => p.x == line.start.x + 2 * xOffset && p.y == line.start.y);
         }
         else {
             dir = line.start.y < line.end.y ? 1 : -1;
-            p1 = points.find(p => p.x == line.start.x 
-                && p.y == line.start.y + cellSize * dir);
-            p2 = points.find(p => p.x == line.start.x 
-                && p.y == line.start.y + 2 * cellSize * dir);
+            const yOffset = this.cellSize * dir;
+                
+            p1 = this.points.find(p => p.x == line.start.x && p.y == line.start.y + yOffset);
+            p2 = this.points.find(p => p.x == line.start.x && p.y == line.start.y + 2 * yOffset);
         }
 
         if(p1.isAvailable && p2.isAvailable) {
@@ -241,40 +245,43 @@ export class Canvas {
             p2.isAvailable = false;
         }
         else {
-            console.log('NO DRAWING HERE BUDDY');
-            lines.pop();
+            console.warn('NO DRAWING HERE BUDDY');
+            this.lines.pop();
         }
 
         this.resetGrid();
     }
 
     resetGrid() {
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.drawPreviousLines();
         this.drawGridWithPath2D();
     }
 
     reset() {
-        direction = '';
-        drawing = false;
-        linePos = {x: 0, y: 0};
-        startPoint = {x: 0, y: 0};
-        oldX = 0;
-        oldY = 0;
+        this.direction = '';
+        this.drawing = false;
+        this.linePos = {x: 0, y: 0};
+        this.startPoint = {x: 0, y: 0};
+        this.oldX = 0;
+        this.oldY = 0;
     }
 
     drawPoints() {
-        points.forEach((point) => {
-            if(point.isAvailable) {
-                ctx.fillStyle = '#11EE28';
-            }
-            else {
-                ctx.fillStyle = 'red';
-            }
+        const availablePointColor = '#11EE28';
+        const unavailablePointColor = 'red';
+        const pointRadius = 10;
+        const {ctx} = this;
+
+        this.points.forEach((point) => {
+            const fillColor = point.isAvailable ? availablePointColor : unavailablePointColor;
+            
             ctx.beginPath();
-            ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = fillColor;
+            ctx.strokeStyle = 'black';
+            ctx.arc(point.x, point.y, pointRadius, 0, 2 * Math.PI);
             ctx.fill();
             ctx.stroke();
-        })
+        });
     }
 }
