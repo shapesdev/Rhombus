@@ -53,6 +53,8 @@ export class Canvas {
     drawGridWithPath2D() {
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#000000';
+        const pointSize = points.length;
+
         for(let i = 0; i <= gridSize; i++) {
             for(let j = 0; j <= gridSize; j++) {
                 if(i < gridSize && j < gridSize) {
@@ -61,7 +63,9 @@ export class Canvas {
                     path.closePath();
                     ctx.stroke(path);
                 }
-                points.push({x: i * cellSize, y: j * cellSize, isAvailable: true});
+                if(pointSize == 0) {
+                    points.push({x: i * cellSize, y: j * cellSize, isAvailable: true});
+                }
             }
         }
         this.drawPoints();
@@ -239,7 +243,7 @@ export class Canvas {
                 item.isAvailable = false;
             }
         }
-        this.drawPoints();
+        this.resetGrid();
     }
 
 /*     isLineOverlapping(cur) {
@@ -273,8 +277,8 @@ export class Canvas {
 
     resetGrid() {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-        this.drawGridWithPath2D();
         this.drawPreviousLines();
+        this.drawGridWithPath2D();
     }
 
     reset() {
@@ -295,7 +299,7 @@ export class Canvas {
                 ctx.fillStyle = 'red';
             }
             ctx.beginPath();
-            ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
+            ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI);
             ctx.fill();
             ctx.stroke();
         })
