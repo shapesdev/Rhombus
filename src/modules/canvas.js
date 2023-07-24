@@ -225,24 +225,26 @@ export class Canvas {
 
     disablePoints(line) {
         let isHorizontal = line.start.y == line.end.y ? true : false;
+        let point1, point2;
+
         if(isHorizontal) {
-            for(let i = line.start.x + cellSize; i < line.end.x; i+=cellSize) {
-                let item = points.find(item => item.x == i && item.y == line.start.y);
-                if(!item.isAvailable) {
-                    console.log('Should not allow to draw');
-                }
-                item.isAvailable = false;
-            }
+            point1 = points.find(p => p.x == line.start.x + cellSize && p.y == line.start.y);
+            point2 = points.find(p => p.x == line.start.x + cellSize * 2 && p.y == line.start.y);
         }
         else {
-            for(let i = line.start.y + cellSize; i < line.end.y; i+=cellSize) {
-                let item = points.find(item => item.x == line.start.x && item.y == i);
-                if(!item.isAvailable) {
-                    console.log('Should not allow to draw');
-                }
-                item.isAvailable = false;
-            }
+            point1 = points.find(p => p.x == line.start.x && p.y == line.start.y + cellSize);
+            point2 = points.find(p => p.x == line.start.x && p.y == line.start.y + 2 * cellSize);
         }
+
+        if(point1.isAvailable && point2.isAvailable) {
+            point1.isAvailable = false;
+            point2.isAvailable = false;
+        }
+        else {
+            console.log('NO DRAWING HERE BUDDY');
+            lines.pop();
+        }
+
         this.resetGrid();
     }
 
