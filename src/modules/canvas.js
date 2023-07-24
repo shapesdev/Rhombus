@@ -212,8 +212,7 @@ export class Canvas {
                     linePos.y = startPoint.y + maxLineLength * dir.y;
                     
                     lines.push(line);
-                    this.drawLine(startPoint, linePos);
-                    this.disablePoints(line);
+                    this.updateDrawPoints(line);
                 }
                 else {
                     console.warn('Line was too short');
@@ -223,17 +222,24 @@ export class Canvas {
         }
     }
 
-    disablePoints(line) {
-        let isHorizontal = line.start.y == line.end.y ? true : false;
+    updateDrawPoints(line) {
+        const isHorizontal = line.start.y == line.end.y ? true : false;
         let point1, point2;
+        let dir;
 
         if(isHorizontal) {
-            point1 = points.find(p => p.x == line.start.x + cellSize && p.y == line.start.y);
-            point2 = points.find(p => p.x == line.start.x + cellSize * 2 && p.y == line.start.y);
+            dir = line.start.x < line.end.x ? 1 : -1;
+            point1 = points.find(p => p.x == line.start.x + cellSize * dir 
+                && p.y == line.start.y);
+            point2 = points.find(p => p.x == line.start.x + cellSize * 2 * dir 
+                && p.y == line.start.y);
         }
         else {
-            point1 = points.find(p => p.x == line.start.x && p.y == line.start.y + cellSize);
-            point2 = points.find(p => p.x == line.start.x && p.y == line.start.y + 2 * cellSize);
+            dir = line.start.y < line.end.y ? 1 : -1;
+            point1 = points.find(p => p.x == line.start.x 
+                && p.y == line.start.y + cellSize * dir);
+            point2 = points.find(p => p.x == line.start.x 
+                && p.y == line.start.y + 2 * cellSize * dir);
         }
 
         if(point1.isAvailable && point2.isAvailable) {
