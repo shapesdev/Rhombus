@@ -61,9 +61,10 @@ export class Canvas {
                     path.closePath();
                     ctx.stroke(path);
                 }
-                points.push({x: i * cellSize, y: j * cellSize});
+                points.push({x: i * cellSize, y: j * cellSize, isAvailable: true});
             }
         }
+        this.drawPoints();
     }
 
     drawLine(start, end, realtime = false) {
@@ -185,11 +186,11 @@ export class Canvas {
             end: {...linePos},
         };
 
-        if(this.isLineOverlapping(line)) {
+/*         if(this.isLineOverlapping(line)) {
             console.warn('Line is overlapping');
             this.resetGrid();
-        }
-        else {
+        } */
+        {
             if(direction in directionMap) {
                 const dir = directionMap[direction];
                 let length;
@@ -205,8 +206,9 @@ export class Canvas {
                     && linePos.x >= 0 && linePos.y >= 0) {
                     linePos.x = startPoint.x + maxLineLength * dir.x;
                     linePos.y = startPoint.y + maxLineLength * dir.y;
-    
+                    
                     lines.push(line);
+                    this.disablePoints(line);
                     this.drawLine(startPoint, linePos);
                 }
                 else {
@@ -217,7 +219,21 @@ export class Canvas {
         }
     }
 
-    isLineOverlapping(cur) {
+    disablePoints(line) {
+        let isHorizontal = line.start.y == line.end.y ? true : false;
+        if(isHorizontal) {
+            for(let i = line.start.x + cellSize; i < line.end.x; i+=cellSize) {
+                let item = points.find(item => item.x == i && item.y == line.start.y);
+                if(!item.isAvailable) {
+                    console.log('Should not allow to draw');
+                }
+                item.isAvailable = false;
+            }
+        }
+        this.drawPoints();
+    }
+
+/*     isLineOverlapping(cur) {
         return lines.some((line) => {
             if(Math.min(cur.start.x, cur.end.x) < Math.max(line.end.x, line.start.x)
                 && Math.max(cur.start.x, cur.end.x) > Math.min(line.start.x, line.end.x)
@@ -244,7 +260,7 @@ export class Canvas {
             }
             return false;
           });
-    }
+    } */
 
     resetGrid() {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -259,5 +275,20 @@ export class Canvas {
         startPoint = {x: 0, y: 0};
         oldX = 0;
         oldY = 0;
+    }
+
+    drawPoints() {
+        points.forEach((point) => {
+            if(point.isAvailable) {
+                ctx.fillStyle = '#11EE28';
+            }
+            else {
+                ctx.fillStyle = 'red';
+            }
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+        })
     }
 }
