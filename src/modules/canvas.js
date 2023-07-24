@@ -101,22 +101,22 @@ export class Canvas {
     setPosition(e) {
         const x = e.x - this.canvas.getBoundingClientRect().left;
         const y = e.y - this.canvas.getBoundingClientRect().top;
-        const { direction, canvasHeight, canvasWidth, linePos, startPoint } = this;
+        const { direction, canvasHeight, canvasWidth, startPoint } = this;
     
         if(['East', 'West'].includes(direction)) {
-            if(linePos.y != canvasHeight && linePos.y != 0 
-                && ((direction === 'East' && x >= linePos.x) 
-                || (direction === 'West' && x <= linePos.x))) {
+            if(this.linePos.y != canvasHeight && this.linePos.y != 0 
+                && ((direction === 'East' && x >= this.linePos.x) 
+                || (direction === 'West' && x <= this.linePos.x))) {
 
-                    linePos = { x: x, y: startPoint.y };
+                    this.linePos = { x: x, y: startPoint.y };
             }
         }
         else if(['South', 'North'].includes(direction)) {
-            if(linePos.x != canvasWidth && linePos.x != 0
-                && ((direction === 'South' && y >= linePos.y) 
-                || (direction === 'North' && y <= linePos.y))) {
+            if(this.linePos.x != canvasWidth && this.linePos.x != 0
+                && ((direction === 'South' && y >= this.linePos.y) 
+                || (direction === 'North' && y <= this.linePos.y))) {
 
-                linePos = { x: startPoint.x, y: y };
+                this.linePos = { x: startPoint.x, y: y };
             }
         }
     }
@@ -166,18 +166,18 @@ export class Canvas {
     }
     
     limitLineLength() {
-        const { linePos, startPoint, maxLineLength } = this;
+        const { startPoint, maxLineLength } = this;
 
-        if (linePos.x - startPoint.x > maxLineLength) {
-            linePos.x = startPoint.x + maxLineLength;
-        } else if (startPoint.x - linePos.x > maxLineLength) {
-            linePos.x = startPoint.x - maxLineLength;
+        if (this.linePos.x - startPoint.x > maxLineLength) {
+            this.linePos.x = startPoint.x + maxLineLength;
+        } else if (startPoint.x - this.linePos.x > maxLineLength) {
+            this.linePos.x = startPoint.x - maxLineLength;
         }
 
-        if (linePos.y - startPoint.y > maxLineLength) {
-            linePos.y = startPoint.y + maxLineLength;
-        } else if (startPoint.y - linePos.y > maxLineLength) {
-            linePos.y = startPoint.y - maxLineLength;
+        if (this.linePos.y - startPoint.y > maxLineLength) {
+            this.linePos.y = startPoint.y + maxLineLength;
+        } else if (startPoint.y - this.linePos.y > maxLineLength) {
+            this.linePos.y = startPoint.y - maxLineLength;
         }
     }
 
@@ -187,11 +187,11 @@ export class Canvas {
     }
 
     validateLine() {
-        const {direction, linePos, startPoint, maxLineLength, canvasWidth, canvasHeight} = this;
+        const {direction, startPoint, maxLineLength, canvasWidth, canvasHeight} = this;
 
         const line = {
             start: {...startPoint},
-            end: {...linePos},
+            end: {...this.linePos},
         };
 
         if(direction in directionMap) {
@@ -199,16 +199,16 @@ export class Canvas {
             let length;
 
             if(dir.x !== 0) {
-                length = Math.abs(linePos.x - startPoint.x) / maxLineLength;
+                length = Math.abs(this.linePos.x - startPoint.x) / maxLineLength;
             }
             else {
-                length = Math.abs(linePos.y - startPoint.y) / maxLineLength;
+                length = Math.abs(this.linePos.y - startPoint.y) / maxLineLength;
             }
 
-            if(length > 0.85 && linePos.x <= canvasWidth && linePos.y <= canvasHeight
-                && linePos.x >= 0 && linePos.y >= 0) {
-                linePos.x = startPoint.x + maxLineLength * dir.x;
-                linePos.y = startPoint.y + maxLineLength * dir.y;
+            if(length > 0.85 && this.linePos.x <= canvasWidth && this.linePos.y <= canvasHeight
+                && this.linePos.x >= 0 && this.linePos.y >= 0) {
+                this.linePos.x = startPoint.x + maxLineLength * dir.x;
+                this.linePos.y = startPoint.y + maxLineLength * dir.y;
                 
                 this.lines.push(line);
                 this.updateDrawPoints(line);
