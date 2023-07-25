@@ -46,7 +46,7 @@ export class Canvas {
     drawGridWithPath2D() {
         this.ctx.lineWidth = 0.2;
         this.ctx.strokeStyle = '#000000';
-        const pointsCollectionEmpty = this.points.length === 0;
+        const isCollectionEmpty = this.points.length === 0;
 
         for(let i = 0; i <= this.gridSize; i++) {
             for(let j = 0; j <= this.gridSize; j++) {
@@ -56,8 +56,13 @@ export class Canvas {
                     path.closePath();
                     this.ctx.stroke(path);
                 }
-                if(pointsCollectionEmpty) {
-                    this.points.push({x: i * this.cellSize, y: j * this.cellSize, isAvailable: true});
+                if(isCollectionEmpty) {
+                    if ((i === 0 || i === this.gridSize) && (j === 0 || j === this.gridSize)) {
+                        continue;
+                    }
+                    else {
+                        this.points.push({x: i * this.cellSize, y: j * this.cellSize, isAvailable: true});
+                    }
                 }
             }
         }
@@ -224,9 +229,8 @@ export class Canvas {
         let p1, p2;
         let dir;
 
-        // Update if touching edges
-        this.updatePointAvailability(this.points.find(p => p.x == line.start.x && p.y == line.start.y));
-        this.updatePointAvailability(this.points.find(p => p.x == line.end.x && p.y == line.end.y));
+        let startPoint = this.points.find(p => p.x == line.start.x && p.y == line.start.y);
+        let endPoint = this.points.find(p => p.x == line.end.x && p.y == line.end.y);
 
         if(isHorizontal) {
             dir = line.start.x < line.end.x ? 1 : -1;
@@ -246,37 +250,53 @@ export class Canvas {
         if(p1.isAvailable && p2.isAvailable) {
             p1.isAvailable = false;
             p2.isAvailable = false;
+
+            // Update if touching edges
+            this.updateEdgePoints(startPoint);
+            this.updateEdgePoints(endPoint);
         }
         else {
             console.warn('No drawing here, buddy');
             this.lines.pop();
         }
-
-        let endingPoint = this.points.find(p => p.x == line.end.x && p.y == line.end.y);
-        this.hasLegalMoves(endingPoint);
-
+        this.updateLegalPoints(startPoint);
+        this.updateLegalPoints(endPoint);
         this.resetGrid();
     }
 
-    updatePointAvailability(point) {
+    updateEdgePoints(point) {
         if (point.x === 0 || point.y === 0 || point.x === this.canvasWidth || point.y === this.canvasHeight) {
             point.isAvailable = false;
         }
     }
 
-    hasLegalMoves(point) {
+    // RULES
+    // 1 - 2 POINTS IN 100 and 200 IN ANY DIRECTION MUST BE AVAILABLE
+    // 2 - POINT OF 300 IN ANY DIRECTION MUST EXIST (CAN BE UN-AVAILABLE)
+    // IF IN NONE OF THE DIRECTIONS FOLLOW BOTH RULES - POINT IS UN-AVAILABLE
+
+    updateLegalPoints(point) {
         // North -> East -> South -> West
         let count = 0;
         for(const direction in directionMap) {
             const {x, y} = directionMap[direction];
-            let pos = {x: point.x + (this.maxLineLength * x),
-                     y: point.y + (this.maxLineLength * y)};
-            let move = this.points.find(p => p.x == pos.x && p.y == pos.y);
-            if(move && move.isAvailable) {
+            
+            // Rule 1
+            let p1 = this.points.find(p => p.x == point.x + (100 * x)
+            && p.y == point.y + (100 * y));
+            let p2 = this.points.find(p => p.x == point.x + (200 * x)
+            && p.y == point.y + (200 * y));
+            // Rule 2
+            let p3 = this.points.find(p => p.x == point.x + (this.maxLineLength * x)
+                                    && p.y == point.y + (this.maxLineLength * y));
+
+            if(p3 && p1.isAvailable && p2.isAvailable) {
                 count++;
             }
         }
-        console.log(count);
+        if(count == 0) {
+            point.isAvailable = false;
+        }
     }
 
     resetGrid() {
