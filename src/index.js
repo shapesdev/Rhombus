@@ -10,5 +10,5 @@ document.addEventListener('mouseup', function() {canvas.completeDraw()});
 init();
 
 function init() {
-    canvas.init();
+    canvas.init(700, 700, 7, 100);
 }

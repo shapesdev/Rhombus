@@ -9,10 +9,6 @@ export class Canvas {
     constructor() {
         this.canvas = null;
         this.ctx = null;
-        this.canvasWidth = 700;
-        this.canvasHeight = 700;
-        this.gridSize = 7;
-        this.cellSize = 100;
         this.maxLineLength = 300;
         this.points = [];
         this.lines = [];
@@ -24,7 +20,12 @@ export class Canvas {
         this.direction = '';
     }
 
-    init() {
+    init(canvasWidth, canvasHeight, gridSize, cellSize) {
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.gridSize = gridSize;
+        this.cellSize = cellSize;
+
         this.createCanvas();
         this.resize();
         this.drawGridWithPath2D();
