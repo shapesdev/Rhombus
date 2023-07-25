@@ -34,7 +34,6 @@ export class Canvas {
     createCanvas() {
         this.canvas = document.createElement('canvas');
         this.canvas.id = 'canvas';
-        this.canvas.style= 'border:2px solid #000000';
         document.body.appendChild(this.canvas);
         this.ctx = this.canvas.getContext('2d');
     }
