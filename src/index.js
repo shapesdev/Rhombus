@@ -1,14 +1,14 @@
-import { Canvas } from "./modules/canvas.js";
+import { Grid } from "./modules/grid.js";
 
-const canvas = new Canvas();
+const grid = new Grid();
 
 // Events
-document.addEventListener('mousemove', function(e) {canvas.draw(e)});
-document.addEventListener('mousedown', function(e) {canvas.setPosition(e)});
-document.addEventListener('mouseup', function() {canvas.completeDraw()});
+document.addEventListener('mousemove', function(e) {grid.draw(e)});
+document.addEventListener('mousedown', function(e) {grid.setPosition(e)});
+document.addEventListener('mouseup', function() {grid.completeDraw()});
 
 init();
 
 function init() {
-    canvas.init(700, 700, 7, 100);
+    grid.init(700, 700, 7, 100);
 }
