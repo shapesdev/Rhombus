@@ -45,14 +45,16 @@ export class DrawSystem {
                 grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
             }
         }
-        //this.drawCorners();
+        this.drawCorners();
     }
 
     colorTile(e) {
-        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / this.grid.tileSize);
-        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / this.grid.tileSize);
-        let tile = this.grid.getTile(x, y);
-        this.canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
+        const {grid, canvas} = this;
+
+        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
+        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
+        let tile = grid.getTile(x, y);
+        canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
     }
 
     drawPreviousLines() {
