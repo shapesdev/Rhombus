@@ -38,10 +38,21 @@ export class DrawSystem {
     }
 
     drawGrid() {
-        this.grid.points.forEach((point) => {
-            this.canvas.drawPath2D(point.x, point.y, this.grid.tileSize, this.grid.tileSize);
-        });
+        const {grid, canvas} = this;
+
+        for(let i = 0; i < grid.size; i++) {
+            for(let j = 0; j < grid.size; j++) {
+                grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
+            }
+        }
         //this.drawCorners();
+    }
+
+    colorTile(e) {
+        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / this.grid.tileSize);
+        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / this.grid.tileSize);
+        let tile = this.grid.getTile(x, y);
+        this.canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
     }
 
     drawPreviousLines() {
@@ -82,7 +93,7 @@ export class DrawSystem {
             let minDistance = 1000000;
             let closestPoint;
     
-            this.grid.points.forEach((point) => {
+            this.grid.vertices.forEach((point) => {
                 let distance = Math.sqrt(Math.pow((x - point.x), 2) +
                 Math.pow((y - point.y), 2));
                 if(distance < minDistance) {
@@ -180,11 +191,11 @@ export class DrawSystem {
         const xOffset = this.grid.tileSize * (isHorizontal ? (line.start.x < line.end.x ? 1 : -1) : 0);
         const yOffset = this.grid.tileSize * (!isHorizontal ? (line.start.y < line.end.y ? 1 : -1) : 0);
 
-        let startPoint = this.grid.getPoint(line.start.x, line.start.y);
-        let endPoint = this.grid.getPoint(line.end.x, line.end.y);
+        let startPoint = this.grid.getVertex(line.start.x, line.start.y);
+        let endPoint = this.grid.getVertex(line.end.x, line.end.y);
 
-        p1 = this.grid.getPoint(line.start.x + xOffset, line.start.y + yOffset);
-        p2 = this.grid.getPoint(line.start.x + 2 * xOffset, line.start.y + 2 * yOffset);
+        p1 = this.grid.getVertex(line.start.x + xOffset, line.start.y + yOffset);
+        p2 = this.grid.getVertex(line.start.x + 2 * xOffset, line.start.y + 2 * yOffset);
 
         if(p1.isAvailable && p2.isAvailable) {
             p1.isAvailable = false;
@@ -216,9 +227,9 @@ export class DrawSystem {
             for(const direction in directionMap) {
                 const {x, y} = directionMap[direction];
                 
-                let p1 = this.grid.getPoint(point.x + (100 * x), point.y + (100 * y));
-                let p2 = this.grid.getPoint(point.x + (200 * x), point.y + (200 * y));
-                let p3 = this.grid.getPoint(point.x + (this.maxLineLength * x), point.y + (this.maxLineLength * y));
+                let p1 = this.grid.getVertex(point.x + (100 * x), point.y + (100 * y));
+                let p2 = this.grid.getVertex(point.x + (200 * x), point.y + (200 * y));
+                let p3 = this.grid.getVertex(point.x + (this.maxLineLength * x), point.y + (this.maxLineLength * y));
     
                 if(p3 && p1.isAvailable && p2.isAvailable) {
                     count++;
@@ -249,7 +260,7 @@ export class DrawSystem {
         const availablePointColor = '#11EE28';
         const unavailablePointColor = 'red';
 
-        this.grid.points.forEach((point) => {
+        this.grid.vertices.forEach((point) => {
             const fillColor = point.isAvailable ? availablePointColor : unavailablePointColor;
             this.canvas.drawPoint(point, 10, fillColor);
         });

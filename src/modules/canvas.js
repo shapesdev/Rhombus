@@ -35,6 +35,12 @@ export class Canvas {
         path.rect(x, y, w, h);
         path.closePath();
         this.ctx.stroke(path);
+        return path;
+    }
+
+    colorPath2D(path, fillStyle = 'green') {
+        this.ctx.fillStyle = fillStyle;
+        this.ctx.fill(path);
     }
 
     drawLine(start, end) {

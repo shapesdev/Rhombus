@@ -23,4 +23,5 @@ function onMouseRelease() {
 
 function onMousePress(e) {
     drawSystem.setPosition(e)
+    drawSystem.colorTile(e);
 }
