@@ -1,19 +1,20 @@
 export class Canvas {
-    constructor() {
+    constructor(width, height) {
         this.canvas = null;
         this.ctx = null;
+        this.width = width;
+        this.height = height;
+        this.init();
     }
 
-    init(canvasWidth, canvasHeight) {
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
+    init() {
         this.createCanvas();
         this.resize();
     }
 
     resize() {
-        this.ctx.canvas.width = this.canvasWidth;
-        this.ctx.canvas.height = this.canvasHeight;
+        this.ctx.canvas.width = this.width;
+        this.ctx.canvas.height = this.height;
     }
 
     getBoundingClientRect() {
@@ -27,9 +28,9 @@ export class Canvas {
         this.ctx = this.canvas.getContext('2d');
     }
 
-    drawPath2D(x, y, w, h) {
-        this.ctx.lineWidth = 0.2;
-        this.ctx.strokeStyle = '#000000';
+    drawPath2D(x, y, w, h, strokeStyle = '#000000', lineWidth = 0.2) {
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.strokeStyle = strokeStyle;
         const path = new Path2D();
         path.rect(x, y, w, h);
         path.closePath();
@@ -59,7 +60,7 @@ export class Canvas {
         ctx.stroke();
     }
 
-    clear() {
-        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    clear(x = 0, y = 0, width = this.width, height = this.height) {
+        this.ctx.clearRect(x, y, width, height);
     }
 }

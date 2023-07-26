@@ -1,14 +1,26 @@
-import { Grid } from "./modules/grid.js";
+import { DrawSystem } from "./modules/drawSystem.js";
 
-const grid = new Grid();
+const drawSystem = new DrawSystem();
 
 // Events
-document.addEventListener('mousemove', function(e) {grid.draw(e)});
-document.addEventListener('mousedown', function(e) {grid.setPosition(e)});
-document.addEventListener('mouseup', function() {grid.completeDraw()});
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseRelease);
+document.addEventListener('mousedown', onMousePress);
 
 init();
 
 function init() {
-    grid.init(700, 700, 7, 100);
+    drawSystem.init(700, 700, 7, 100);
+}
+
+function onMouseMove(e) {
+    drawSystem.draw(e);
+}
+
+function onMouseRelease() {
+    drawSystem.complete();
+}
+
+function onMousePress(e) {
+    drawSystem.setPosition(e)
 }
