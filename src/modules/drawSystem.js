@@ -41,7 +41,7 @@ export class DrawSystem {
         this.grid.points.forEach((point) => {
             this.canvas.drawPath2D(point.x, point.y, this.grid.tileSize, this.grid.tileSize);
         });
-        this.drawCorners();
+        //this.drawCorners();
     }
 
     drawPreviousLines() {
@@ -211,20 +211,22 @@ export class DrawSystem {
 
     updateLegalPoints(point) {
         // North -> East -> South -> West
-        let count = 0;
-        for(const direction in directionMap) {
-            const {x, y} = directionMap[direction];
-            
-            let p1 = this.grid.getPoint(point.x + (100 * x), point.y + (100 * y));
-            let p2 = this.grid.getPoint(point.x + (200 * x), point.y + (200 * y));
-            let p3 = this.grid.getPoint(point.x + (this.maxLineLength * x), point.y + (this.maxLineLength * y));
-
-            if(p3 && p1.isAvailable && p2.isAvailable) {
-                count++;
+        if(point) {
+            let count = 0;
+            for(const direction in directionMap) {
+                const {x, y} = directionMap[direction];
+                
+                let p1 = this.grid.getPoint(point.x + (100 * x), point.y + (100 * y));
+                let p2 = this.grid.getPoint(point.x + (200 * x), point.y + (200 * y));
+                let p3 = this.grid.getPoint(point.x + (this.maxLineLength * x), point.y + (this.maxLineLength * y));
+    
+                if(p3 && p1.isAvailable && p2.isAvailable) {
+                    count++;
+                }
             }
-        }
-        if(count == 0) {
-            point.isAvailable = false;
+            if(count == 0) {
+                point.isAvailable = false;
+            }
         }
     }
 
