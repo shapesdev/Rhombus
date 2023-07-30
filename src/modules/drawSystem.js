@@ -1,13 +1,6 @@
 import { Canvas } from "./canvas.js";
 import { Grid } from "./grid.js";
 
-const directionMap = {
-    North: {x: 0, y: -1},
-    East: {x: 1, y: 0},
-    South: {x: 0, y: 1},
-    West: {x: -1, y: 0},
-};
-
 export class DrawSystem {
     constructor() {
         this.canvas = null;
@@ -53,8 +46,17 @@ export class DrawSystem {
 
         const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
         const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
-        let tile = grid.getTile(x, y);
+        const tile = grid.getTile(x, y);
         canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
+    }
+
+    drawPath(e) {
+        const {grid, canvas} = this;
+
+        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
+        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
+        const tile = grid.getTile(x, y);
+        canvas.drawPoint(tile.x * this.grid.tileSize + 50, tile.y * this.grid.tileSize + 50, 8);
     }
 
     drawPreviousLines() {
@@ -161,8 +163,8 @@ export class DrawSystem {
             end: {...this.linePos},
         };
 
-        if(direction in directionMap) {
-            const dir = directionMap[direction];
+        if(direction in this.grid.directionMap) {
+            const dir = this.grid.directionMap[direction];
             let length;
 
             if(dir.x !== 0) {
@@ -177,68 +179,13 @@ export class DrawSystem {
                 this.linePos.x = startPoint.x + maxLineLength * dir.x;
                 this.linePos.y = startPoint.y + maxLineLength * dir.y;
                 
+                this.grid.updatePoints(line);
                 this.lines.push(line);
-                this.updateDrawPoints(line);
+                this.clear();
             }
             else {
                 console.warn('Line was too short');
                 this.clear();
-            }
-        }
-    }
-
-    updateDrawPoints(line) {
-        const isHorizontal = line.start.y === line.end.y;
-        let p1, p2;
-        const xOffset = this.grid.tileSize * (isHorizontal ? (line.start.x < line.end.x ? 1 : -1) : 0);
-        const yOffset = this.grid.tileSize * (!isHorizontal ? (line.start.y < line.end.y ? 1 : -1) : 0);
-
-        let startPoint = this.grid.getVertex(line.start.x, line.start.y);
-        let endPoint = this.grid.getVertex(line.end.x, line.end.y);
-
-        p1 = this.grid.getVertex(line.start.x + xOffset, line.start.y + yOffset);
-        p2 = this.grid.getVertex(line.start.x + 2 * xOffset, line.start.y + 2 * yOffset);
-
-        if(p1.isAvailable && p2.isAvailable) {
-            p1.isAvailable = false;
-            p2.isAvailable = false;
-
-            // Update start point if touching edge
-            this.updateEdgePoint(startPoint);
-            this.updateEdgePoint(endPoint);
-        }
-        else {
-            console.warn('No drawing here, buddy');
-            this.lines.pop();
-        }
-        this.updateLegalPoints(startPoint);
-        this.updateLegalPoints(endPoint);
-        this.clear();
-    }
-
-    updateEdgePoint(point) {
-        if (point.x === 0 || point.y === 0 || point.x === this.canvas.width || point.y === this.canvas.height) {
-            point.isAvailable = false;
-        }
-    }
-
-    updateLegalPoints(point) {
-        // North -> East -> South -> West
-        if(point) {
-            let count = 0;
-            for(const direction in directionMap) {
-                const {x, y} = directionMap[direction];
-                
-                let p1 = this.grid.getVertex(point.x + (100 * x), point.y + (100 * y));
-                let p2 = this.grid.getVertex(point.x + (200 * x), point.y + (200 * y));
-                let p3 = this.grid.getVertex(point.x + (this.maxLineLength * x), point.y + (this.maxLineLength * y));
-    
-                if(p3 && p1.isAvailable && p2.isAvailable) {
-                    count++;
-                }
-            }
-            if(count == 0) {
-                point.isAvailable = false;
             }
         }
     }
@@ -259,12 +206,21 @@ export class DrawSystem {
     }
 
     drawCorners() {
-        const availablePointColor = '#11EE28';
-        const unavailablePointColor = 'red';
+        const isTakenPointColor = 'red';
+        const isReservedPointcolor = 'orange';
+        let fillColor;
 
-        this.grid.vertices.forEach((point) => {
-            const fillColor = point.isAvailable ? availablePointColor : unavailablePointColor;
-            this.canvas.drawPoint(point, 10, fillColor);
+        this.grid.vertices.forEach((vertex) => {
+            if(vertex.isTaken) {
+                fillColor = isTakenPointColor;
+            }
+            else if(vertex.isReserved) {
+                fillColor = isReservedPointcolor;
+            }
+            else {
+                fillColor = '#11EE28';
+            }
+            this.canvas.drawPoint(vertex.x, vertex.y, 10, fillColor);
         });
     }
 }

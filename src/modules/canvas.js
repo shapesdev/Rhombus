@@ -55,13 +55,13 @@ export class Canvas {
         ctx.stroke();
     }
 
-    drawPoint(point, pointRadius, fillColor) {
+    drawPoint(x, y, pointRadius, fillColor = 'black') {
         const {ctx} = this;
 
         ctx.beginPath();
         ctx.fillStyle = fillColor;
         ctx.strokeStyle = 'black';
-        ctx.arc(point.x, point.y, pointRadius, 0, 2 * Math.PI);
+        ctx.arc(x, y, pointRadius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
     }
