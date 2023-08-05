@@ -39,9 +39,9 @@ export class DrawSystem {
             }
         }
 
-        //this.canvas.drawLine(grid.edges)
         //this.drawVertices();
-        this.drawEdges();
+        //this.drawEdges();
+        this.drawVerticesLegalMoves();
     }
 
     colorTile(e) {
@@ -236,6 +236,20 @@ export class DrawSystem {
                 fillColor = '#11EE28';
             }
             this.canvas.drawPoint(vertex.x, vertex.y, 10, fillColor);
+        });
+    }
+
+    drawVerticesLegalMoves() {
+        this.grid.vertices.forEach((vertex) => {
+            if(vertex.x > 300 && vertex.y > 100) {
+                this.canvas.drawText(vertex.x - 10, vertex.y - 10, vertex.moves);
+            }
+            else if(vertex.y < 100) {
+                this.canvas.drawText(vertex.x, vertex.y + 15, vertex.moves);
+            }
+            else {
+                this.canvas.drawText(vertex.x, vertex.y - 10, vertex.moves);
+            }
         });
     }
 }

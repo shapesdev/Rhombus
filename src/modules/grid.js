@@ -58,10 +58,11 @@ export class Grid {
                     }
                 }
                 if(!(x == 0 && y == 0) && !(x == size && y == 0) && !(x == 0 && y == size) && !(x == size && y == size)) {
-                    this.vertices.push({x: x * tileSize, y: y * tileSize});
+                    this.vertices.push({x: x * tileSize, y: y * tileSize, moves: 0});
                 }
             }
         }
+        this.updateVertices();
     }
 
     makeSouthNorthNeighbors(south, north) {
@@ -117,6 +118,35 @@ export class Grid {
             }
         });
     } */
+
+    updateVertices() {
+        this.vertices.forEach((vert) => {
+            this.setLegalMoveCount(vert);
+        });
+    }
+
+    setLegalMoveCount(vert) {
+        let count = 0;
+        for(const direction in this.directionMap) {
+            const {x, y} = this.directionMap[direction];
+
+            if(x == 0 && (vert.x == 0 || vert.x == this.size * this.tileSize)) {
+                continue;
+            }
+            else if(y == 0 && (vert.y == 0 || vert.y == this.size * this.tileSize)) {
+                continue;
+            }
+            
+            let p1 = this.getVertex(vert.x + (1 * this.tileSize * x), vert.y + (1 * this.tileSize * y));
+            let p2 = this.getVertex(vert.x + (2 * this.tileSize * x), vert.y + (2 * this.tileSize * y));
+            let p3 = this.getVertex(vert.x + (3 * this.tileSize * x), vert.y + (3 * this.tileSize * y));
+
+            if(p1 && p2 && p3) {
+                count++;
+            }
+        }
+        vert.moves = count;
+    }
 
     updateEdgeVertex(vert) {
         if (vert.x === 0 || vert.y === 0 || vert.x === this.size * this.tileSize || vert.y === this.size * this.tileSize) {
