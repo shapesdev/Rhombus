@@ -66,6 +66,13 @@ export class Canvas {
         ctx.stroke();
     }
 
+    drawText(x, y, text, fillColor = 'black', font = 'bold 20px san-serif') {
+        const {ctx} = this;
+        ctx.fillStyle = fillColor;
+        ctx.font = font;
+        ctx.fillText(text, x, y);
+    }
+
     clear(x = 0, y = 0, width = this.width, height = this.height) {
         this.ctx.clearRect(x, y, width, height);
     }

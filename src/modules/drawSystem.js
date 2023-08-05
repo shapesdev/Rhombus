@@ -38,7 +38,10 @@ export class DrawSystem {
                 grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
             }
         }
-        this.drawCorners();
+
+        //this.canvas.drawLine(grid.edges)
+        //this.drawVertices();
+        this.drawEdges();
     }
 
     colorTile(e) {
@@ -179,14 +182,13 @@ export class DrawSystem {
                 this.linePos.x = startPoint.x + maxLineLength * dir.x;
                 this.linePos.y = startPoint.y + maxLineLength * dir.y;
                 
-                this.grid.updatePoints(line);
                 this.lines.push(line);
-                this.clear();
+                //this.grid.isLineValid(line);
             }
             else {
-                console.warn('Line was too short');
-                this.clear();
+                console.warn('Line is not valid');
             }
+            this.clear();
         }
     }
 
@@ -205,7 +207,20 @@ export class DrawSystem {
         this.oldY = 0;
     }
 
-    drawCorners() {
+    drawEdges() {
+        this.grid.edges.forEach((edge) => {
+            if(edge != null) {
+                if(edge.edgeType == 'N') {
+                    this.canvas.drawText(edge.x * this.grid.tileSize + 50, edge.y * this.grid.tileSize + 10, 'N');
+                }
+                else if(edge.edgeType == 'W') {
+                    this.canvas.drawText(edge.x * this.grid.tileSize - 10, edge.y * this.grid.tileSize + 50, 'W');
+                }
+            }
+        });
+    }
+
+    drawVertices() {
         const isTakenPointColor = 'red';
         const isReservedPointcolor = 'orange';
         let fillColor;
