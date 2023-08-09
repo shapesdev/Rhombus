@@ -116,6 +116,7 @@ export class Grid {
         this.vertices.forEach((vert) => {
             this.setLegalMoveCount(vert);
         });
+        this.totalLegalMoves /= 2;
         console.log(`LEGAL MOVES LEFT: ${this.totalLegalMoves}`);
     }
 

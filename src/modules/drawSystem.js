@@ -40,7 +40,7 @@ export class DrawSystem {
 
         //this.drawVertices();
         //this.drawEdges();
-        this.drawVerticesLegalMoves();
+        //this.drawVerticesLegalMoves();
     }
 
     colorTile(e) {
@@ -219,16 +219,11 @@ export class DrawSystem {
     }
 
     drawVertices() {
-        const isTakenPointColor = 'red';
-        const isReservedPointcolor = 'orange';
         let fillColor;
 
         this.grid.vertices.forEach((vertex) => {
-            if(vertex.isTaken) {
-                fillColor = isTakenPointColor;
-            }
-            else if(vertex.isReserved) {
-                fillColor = isReservedPointcolor;
+            if(vertex.moves == 0) {
+                fillColor = 'red';
             }
             else {
                 fillColor = '#11EE28';

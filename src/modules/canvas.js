@@ -43,13 +43,13 @@ export class Canvas {
         this.ctx.fill(path);
     }
 
-    drawLine(start, end) {
+    drawLine(start, end, lineWidth = 5, strokeStyle = 'black', lineCap = 'round') {
         const {ctx} = this;
 
         ctx.beginPath();
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = 'black';
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineCap = lineCap;
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
