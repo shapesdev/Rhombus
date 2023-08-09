@@ -58,7 +58,7 @@ export class Grid {
                     }
                 }
                 if(!(x == 0 && y == 0) && !(x == size && y == 0) && !(x == 0 && y == size) && !(x == size && y == size)) {
-                    this.vertices.push({x: x * tileSize, y: y * tileSize, moves: 0});
+                    this.vertices.push({x: x * tileSize, y: y * tileSize, isAvailable : true, isReserved: false, moves: 0});
                 }
             }
         }
@@ -86,12 +86,10 @@ export class Grid {
         p3 = this.getVertex(line.start.x + 2 * xOffset, line.start.y + 2 * yOffset);
         p4 = this.getVertex(line.end.x, line.end.y);
 
-
-        if((!p2.isTaken && !p3.isTaken) && (!p2.isReserved && !p3.isReserved)) {
-            p1.isReserved = true;
-            p2.isTaken = true;
-            p3.isTaken = true;
-            p4.isReserved = true;
+        if(p2.isAvailable && p3.isAvailable) {
+            p2.isAvailable = false;
+            p3.isAvailable = false;
+            this.updateVertices();
             return true;
         }
         else {
@@ -141,7 +139,7 @@ export class Grid {
             let p2 = this.getVertex(vert.x + (2 * this.tileSize * x), vert.y + (2 * this.tileSize * y));
             let p3 = this.getVertex(vert.x + (3 * this.tileSize * x), vert.y + (3 * this.tileSize * y));
 
-            if(p1 && p2 && p3) {
+            if(p3 && p1.isAvailable && p2.isAvailable) {
                 count++;
             }
         }
