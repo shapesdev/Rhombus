@@ -27,6 +27,8 @@ export class Grid {
         this.vertices = [];
         this.tiles = [];
         this.edges = [];
+        this.lines = [];
+        this.totalLegalMoves = 0;
         this.directionMap = {
             North: {x: 0, y: -1},
             East: {x: 1, y: 0},
@@ -58,7 +60,7 @@ export class Grid {
                     }
                 }
                 if(!(x == 0 && y == 0) && !(x == size && y == 0) && !(x == 0 && y == size) && !(x == size && y == size)) {
-                    this.vertices.push({x: x * tileSize, y: y * tileSize, isAvailable : true, isReserved: false, moves: 0});
+                    this.vertices.push({x: x * tileSize, y: y * tileSize, moves: 0});
                 }
             }
         }
@@ -75,81 +77,75 @@ export class Grid {
         west.east = east;
     }
 
-    isLineValid(line) {
-        const isHorizontal = line.start.y === line.end.y;
-        let p1, p2, p3, p4;
-        const xOffset = this.tileSize * (isHorizontal ? (line.start.x < line.end.x ? 1 : -1) : 0);
-        const yOffset = this.tileSize * (!isHorizontal ? (line.start.y < line.end.y ? 1 : -1) : 0);
+    isIntersecting(x1, x2, y1, y2) {
+        let intersecting = false;
+        let x3, x4, y3, y4;
+        if(this.lines.length > 0) {
+            this.lines.forEach((l) => {
+                x3 = l.start.x;
+                y3 = l.start.y;
+                x4 = l.end.x;
+                y4 = l.end.y;
 
-        p1 = this.getVertex(line.start.x, line.start.y);
-        p2 = this.getVertex(line.start.x + xOffset, line.start.y + yOffset);
-        p3 = this.getVertex(line.start.x + 2 * xOffset, line.start.y + 2 * yOffset);
-        p4 = this.getVertex(line.end.x, line.end.y);
+                if(Math.max(x1, x2) > Math.min(x3, x4) &&
+                   Math.min(x1, x2) < Math.max(x3, x4) && y1 == y3 && y2 == y4) {
+                    intersecting = true;
+                }
+                else if(Math.max(y1, y2) > Math.min(y3, y4) &&
+                        Math.min(y1, y2) < Math.max(y3, y4) && x1 == x3 && x2 == x4) {
+                    intersecting = true;
+                }
+        
+                let t = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4)) /
+                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+                
+                let u = ((x1 - x3)*(y1 - y2) - (y1 - y3)*(x1 - x2)) /
+                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+        
 
-        if(p2.isAvailable && p3.isAvailable) {
-            p2.isAvailable = false;
-            p3.isAvailable = false;
-            this.updateVertices();
-            return true;
+                if(t > 0 && t < 1 && u > 0 && u < 1) {
+                    intersecting = true;
+                }
+            });
         }
-        else {
-            return false;
-        }
+        return intersecting;
     }
 
-/*     updateVertexCollection() {
-        this.vertices.forEach((vertex) =>{
-            let count = 0;
-            for(const direction in this.directionMap) {
-                const {x, y} = this.directionMap[direction];
-                
-                let p1 = this.getVertex(vertex.x + (1 * this.tileSize * x), vertex.y + (1 * this.tileSize * y));
-                let p2 = this.getVertex(vertex.x + (2 * this.tileSize * x), vertex.y + (2 * this.tileSize * y));
-                let p3 = this.getVertex(vertex.x + (3 * this.tileSize * x), vertex.y + (3 * this.tileSize * y));
-    
-                if(p3 &&(!p1.isTaken && !p2.isTaken) && (!p1.isReserved && !p2.isReserved)) {
-                    count++;
-                }
-            }
-            if(count == 0) {
-                vertex.isReserved = true;
-            }
-        });
-    } */
-
     updateVertices() {
+        this.totalLegalMoves = 0;
         this.vertices.forEach((vert) => {
             this.setLegalMoveCount(vert);
         });
+        console.log(`LEGAL MOVES LEFT: ${this.totalLegalMoves}`);
     }
 
-    setLegalMoveCount(vert) {
+    setLegalMoveCount(start) {
         let count = 0;
         for(const direction in this.directionMap) {
             const {x, y} = this.directionMap[direction];
 
-            if(x == 0 && (vert.x == 0 || vert.x == this.size * this.tileSize)) {
+            if(x == 0 && (start.x == 0 || start.x == this.size * this.tileSize)) {
                 continue;
             }
-            else if(y == 0 && (vert.y == 0 || vert.y == this.size * this.tileSize)) {
+            else if(y == 0 && (start.y == 0 || start.y == this.size * this.tileSize)) {
                 continue;
             }
-            
-            let p1 = this.getVertex(vert.x + (1 * this.tileSize * x), vert.y + (1 * this.tileSize * y));
-            let p2 = this.getVertex(vert.x + (2 * this.tileSize * x), vert.y + (2 * this.tileSize * y));
-            let p3 = this.getVertex(vert.x + (3 * this.tileSize * x), vert.y + (3 * this.tileSize * y));
 
-            if(p3 && p1.isAvailable && p2.isAvailable) {
-                count++;
+            let end = this.getVertex(start.x + (3 * this.tileSize * x), start.y + (3 * this.tileSize * y));
+
+            if(end) {
+                if(!this.isIntersecting(start.x, end.x, start.y, end.y)) {
+                    count++;
+                }
             }
         }
-        vert.moves = count;
+        start.moves = count;
+        this.totalLegalMoves += count;
     }
 
-    updateEdgeVertex(vert) {
-        if (vert.x === 0 || vert.y === 0 || vert.x === this.size * this.tileSize || vert.y === this.size * this.tileSize) {
-            vert.isTaken = true;
-        }
+    updateGridCollections(line) {
+        this.lines.push(line);
+        this.updateVertices();
     }
 
     getVertex(x, y) {

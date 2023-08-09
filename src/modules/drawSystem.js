@@ -6,7 +6,6 @@ export class DrawSystem {
         this.canvas = null;
         this.grid = null;
         this.maxLineLength = 300;
-        this.lines = [];
         this.linePos = { x: 0, y: 0 };
         this.startPoint = { x: 0, y: 0 };
         this.oldX = 0;
@@ -63,8 +62,8 @@ export class DrawSystem {
     }
 
     drawPreviousLines() {
-        if(this.lines.length > 0) {
-            this.lines.forEach((line) => {
+        if(this.grid.lines.length > 0) {
+            this.grid.lines.forEach((line) => {
                 this.canvas.drawLine(line.start, line.end);
             })
         }
@@ -178,11 +177,11 @@ export class DrawSystem {
             }
 
             if(length > 0.85 && this.linePos.x <= this.canvas.width && this.linePos.y <= this.canvas.height
-                && this.linePos.x >= 0 && this.linePos.y >= 0 && !this.isIntersecting(line)) {
+                && this.linePos.x >= 0 && this.linePos.y >= 0 && !this.grid.isIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {
                 this.linePos.x = startPoint.x + maxLineLength * dir.x;
                 this.linePos.y = startPoint.y + maxLineLength * dir.y;
             
-                this.lines.push(line);
+                this.grid.updateGridCollections(line);
             }
             else {
                 console.warn('Line is not valid');
@@ -190,49 +189,6 @@ export class DrawSystem {
             this.clear();
         }
     }
-
-    isIntersecting(line) {
-        let intersecting = false;
-        let x1, x2, x3, x4, y1, y2, y3, y4;
-        if(this.lines.length > 0) {
-            this.lines.forEach((l) => {
-                x1 = line.start.x;
-                y1 = line.start.y;
-                x2 = line.end.x;
-                y2 = line.end.y;
-                x3 = l.start.x;
-                y3 = l.start.y;
-                x4 = l.end.x;
-                y4 = l.end.y;
-
-                if(Math.max(x1, x2) > Math.min(x3, x4) &&
-                   Math.min(x1, x2) < Math.max(x3, x4) && y1 == y3 && y2 == y4) {
-                    intersecting = true;
-                }
-                else if(Math.max(y1, y2) > Math.min(y3, y4) &&
-                        Math.min(y1, y2) < Math.max(y3, y4) && x1 == x3 && x2 == x4) {
-                    intersecting = true;
-                }
-        
-                let t = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4)) /
-                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-                
-                let u = ((x1 - x3)*(y1 - y2) - (y1 - y3)*(x1 - x2)) /
-                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-        
-
-                if(t > 0 && t < 1 && u > 0 && u < 1) {
-                    intersecting = true;
-                }
-            });
-        }
-        return intersecting;
-    }
-
-    // Horizontal both NaN  = Not touching
-    // Barely touching vertically, u is 1, t is 0.66 - Shows vertical intersection
-    // Infinity = Not touching
-    // When t == u (Overlapping)
 
     clear() {
         this.canvas.clear();
