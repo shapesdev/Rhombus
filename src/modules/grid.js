@@ -117,7 +117,7 @@ export class Grid {
             this.setLegalMoveCount(vert);
         });
         this.totalLegalMoves /= 2;
-        console.log(`LEGAL MOVES LEFT: ${this.totalLegalMoves}`);
+        console.log(`POSSIBLE MOVES LEFT: ${this.totalLegalMoves}`);
     }
 
     setLegalMoveCount(start) {

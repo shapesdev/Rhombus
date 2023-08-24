@@ -12,6 +12,7 @@ export class DrawSystem {
         this.oldY = 0;
         this.drawing = false;
         this.direction = '';
+        this.lineColor = 'black';
     }
 
     init(canvasWidth, canvasHeight, gridSize, tileSize) {
@@ -26,7 +27,8 @@ export class DrawSystem {
         this.setStartPoint(e);
         this.setPosition(e);
         this.limitLineLength();
-        this.canvas.drawLine(this.startPoint, this.linePos);
+        this.updateLineColor();
+        this.canvas.drawLine(this.startPoint, this.linePos, 5, this.lineColor);
     }
 
     drawGrid() {
@@ -38,7 +40,7 @@ export class DrawSystem {
             }
         }
 
-        //this.drawVertices();
+        this.drawVertices();
         //this.drawEdges();
         //this.drawVerticesLegalMoves();
     }
@@ -157,6 +159,22 @@ export class DrawSystem {
         this.reset();
     }
 
+    updateLineColor() {
+        const {startPoint} = this;
+
+        const line = {
+            start: {...startPoint},
+            end: {...this.linePos},
+        };
+
+        if(!this.grid.isIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {       
+            this.lineColor = 'black';
+        }
+        else {
+            this.lineColor = 'red';
+        }
+    }
+
     validateLine() {
         const {direction, startPoint, maxLineLength } = this;
 
@@ -220,7 +238,6 @@ export class DrawSystem {
 
     drawVertices() {
         let fillColor;
-
         this.grid.vertices.forEach((vertex) => {
             if(vertex.moves == 0) {
                 fillColor = 'red';
