@@ -116,31 +116,31 @@ export class Grid {
         this.vertices.forEach((vert) => {
             this.setLegalMoveCount(vert);
         });
-        this.totalLegalMoves /= 2;
-        console.log(`POSSIBLE MOVES LEFT: ${this.totalLegalMoves}`);
+        this.totalLegalMoves /= 2; // Divide it, since it includes both directions
+        //console.log(`POSSIBLE MOVES LEFT: ${this.totalLegalMoves}`);
     }
 
-    setLegalMoveCount(start) {
+    setLegalMoveCount(vert) {
         let count = 0;
         for(const direction in this.directionMap) {
             const {x, y} = this.directionMap[direction];
 
-            if(x == 0 && (start.x == 0 || start.x == this.size * this.tileSize)) {
+            if(x == 0 && (vert.x == 0 || vert.x == this.size * this.tileSize)) {
                 continue;
             }
-            else if(y == 0 && (start.y == 0 || start.y == this.size * this.tileSize)) {
+            else if(y == 0 && (vert.y == 0 || vert.y == this.size * this.tileSize)) {
                 continue;
             }
 
-            let end = this.getVertex(start.x + (3 * this.tileSize * x), start.y + (3 * this.tileSize * y));
+            let end = this.getVertex(vert.x + (3 * this.tileSize * x), vert.y + (3 * this.tileSize * y));
 
             if(end) {
-                if(!this.isIntersecting(start.x, end.x, start.y, end.y)) {
+                if(!this.isIntersecting(vert.x, end.x, vert.y, end.y)) {
                     count++;
                 }
             }
         }
-        start.moves = count;
+        vert.moves = count;
         this.totalLegalMoves += count;
     }
 
