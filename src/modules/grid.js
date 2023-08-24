@@ -38,8 +38,8 @@ export class Grid {
             S: {x: 0, y: 1},
             W: {x: -1, y: 0},
         };
-        this.startNode = null;
-        this.endNode = null;
+/*         this.startNode = null;
+        this.endNode = null; */
         this.init();
     }
 
@@ -126,17 +126,16 @@ export class Grid {
         return intersecting;
     }
 
-    updateData(line) {
+    updateData(line, dir) {
         this.lines.push(line);
         this.updateVertices();
+        this.checkPathfinding(line, dir);
     }
 
-    updatePathfinding(line, dir) {
+    checkPathfinding(line, dir) {
         let x = line.start.x;
         let y = line.start.y;
         let edgeType = dir.x == 0 ? 'W' : 'N';
-
-        let markedEdges = [];
 
         for(let i = 0; i <= 2; i++) {
             let newX = (x + i * dir.x * this.tileSize) / this.tileSize;
@@ -150,17 +149,20 @@ export class Grid {
             }
 
             let edge = this.getEdge(newX, newY, edgeType);
-            markedEdges.push(edge);
+
+            edge.tile1.neighbors.splice(edge.tile1.neighbors.indexOf(edge.tile2), 1);
+            edge.tile2.neighbors.splice(edge.tile2.neighbors.indexOf(edge.tile1), 1);
+            
+            this.isPathPossible(edge.tile1, edge.tile2);
         }
-        return markedEdges;
     }
 
-    getAStarPath() {
+    isPathPossible(startNode, endNode) {
         const closedList = [];
         const openList = [];
         let pathPossible = false;
 
-        openList.push(this.startNode);
+        openList.push(startNode);
 
         while(openList.length > 0 ) {
             let node = openList[0];
@@ -172,7 +174,7 @@ export class Grid {
             openList.splice(openList.indexOf(node), 1);
             closedList.push(node);
 
-            if(node == this.endNode) {
+            if(node == endNode) {
                 pathPossible = true;
                 break;
             }
@@ -180,8 +182,8 @@ export class Grid {
             if(node.neighbors.length > 0) {
                 node.neighbors.forEach((neighbor) => {
                     if(!closedList.includes(neighbor) && !openList.includes(neighbor)) {
-                        neighbor.g = Math.abs(this.startNode.x - neighbor.x) + Math.abs(this.startNode.y - neighbor.y);
-                        neighbor.h = Math.abs(this.endNode.x - neighbor.x) + Math.abs(this.endNode.y - neighbor.y);
+                        neighbor.g = Math.abs(startNode.x - neighbor.x) + Math.abs(startNode.y - neighbor.y);
+                        neighbor.h = Math.abs(endNode.x - neighbor.x) + Math.abs(endNode.y - neighbor.y);
                         neighbor.f = neighbor.g + neighbor.h;
                         neighbor.nextOnPath = node;
                         if(!openList.includes(neighbor)) {
@@ -192,7 +194,13 @@ export class Grid {
             }
         }
 
-        if(pathPossible) {
+        console.log(pathPossible);
+        if(pathPossible == false) {
+            console.log(startNode);
+            console.log(endNode);
+        }
+
+/*         if(pathPossible) {
             const shortestPath = [];
             let current = this.endNode;
             while(current !== this.startNode) {
@@ -204,7 +212,7 @@ export class Grid {
         }
         else {
             return [];
-        }
+        } */
     }
 
     updateVertices() {

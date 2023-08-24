@@ -41,7 +41,7 @@ export class DrawSystem {
         }
         //this.drawVertices();
         //this.drawVerticesLegalMoves();
-        this.drawEdges();
+        //this.drawEdges();
     }
 
     colorTileOnClick(e) {
@@ -199,11 +199,6 @@ export class DrawSystem {
                 this.linePos.y = startPoint.y + maxLineLength * dir.y;
             
                 this.grid.updateData(line, dir);
-                let edges = this.grid.updatePathfinding(line, dir);
-                edges.forEach((edge) => {
-                    this.canvas.colorPath2D(edge.tile1.path);
-                    this.canvas.colorPath2D(edge.tile2.path);
-                });
             }
             else {
                 console.warn('Line is not valid');
@@ -289,7 +284,7 @@ export class DrawSystem {
         const tile = grid.getTile(x, y);
         grid.startNode = tile;
 
-        let path = grid.getAStarPath();
+        let path = grid.isPathPossible();
 
         path.forEach((p) => {
             this.canvas.colorPath2D(p.path, '#58D68D');
