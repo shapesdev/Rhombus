@@ -41,6 +41,7 @@ export class DrawSystem {
         }
         //this.drawVertices();
         //this.drawVerticesLegalMoves();
+        this.drawEdges();
     }
 
     colorTileOnClick(e) {
@@ -197,12 +198,17 @@ export class DrawSystem {
                 this.linePos.x = startPoint.x + maxLineLength * dir.x;
                 this.linePos.y = startPoint.y + maxLineLength * dir.y;
             
-                this.grid.updateCollections(line);
+                this.grid.updateData(line, dir);
+                let edges = this.grid.updatePathfinding(line, dir);
+                edges.forEach((edge) => {
+                    this.canvas.colorPath2D(edge.tile1.path);
+                    this.canvas.colorPath2D(edge.tile2.path);
+                });
             }
             else {
                 console.warn('Line is not valid');
             }
-            this.clear();
+            //this.clear();
         }
     }
 
@@ -210,8 +216,6 @@ export class DrawSystem {
         this.canvas.clear();
         this.drawPreviousLines();
         this.drawGrid();
-        // FOR NOW
-        this.drawAStarCosts();
     }
 
     reset() {
@@ -246,6 +250,20 @@ export class DrawSystem {
             }
             else {
                 this.canvas.drawText(vertex.x, vertex.y - 10, vertex.moves);
+            }
+        });
+    }
+
+    
+    drawEdges() {
+        this.grid.edges.forEach((edge) => {
+            if(edge != null) {
+                if(edge.edgeType == 'N') {
+                    this.canvas.drawText(edge.x * this.grid.tileSize + 50, edge.y * this.grid.tileSize + 10, 'N');
+                }
+                else if(edge.edgeType == 'W') {
+                    this.canvas.drawText(edge.x * this.grid.tileSize - 10, edge.y * this.grid.tileSize + 50, 'W');
+                }
             }
         });
     }
