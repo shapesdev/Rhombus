@@ -14,14 +14,14 @@ function init() {
 }
 
 function onMouseMove(e) {
-    drawSystem.draw(e);
+    //drawSystem.draw(e);
 }
 
 function onMouseRelease() {
-    drawSystem.complete();
+    //drawSystem.complete();
 }
 
 function onMousePress(e) {
-    drawSystem.setPosition(e);
-    //drawSystem.colorTile(e);
+    //drawSystem.setPosition(e);
+    drawSystem.selectTileOnClick(e);
 }

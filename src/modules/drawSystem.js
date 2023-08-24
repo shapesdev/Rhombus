@@ -39,13 +39,11 @@ export class DrawSystem {
                 grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
             }
         }
-
-        this.drawVertices();
-        //this.drawEdges();
+        //this.drawVertices();
         //this.drawVerticesLegalMoves();
     }
 
-    colorTile(e) {
+    colorTileOnClick(e) {
         const {grid, canvas} = this;
 
         const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
@@ -54,7 +52,7 @@ export class DrawSystem {
         canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
     }
 
-    drawPath(e) {
+    drawPath2D(e) {
         const {grid, canvas} = this;
 
         const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
@@ -78,16 +76,16 @@ export class DrawSystem {
             let y = this.oldY;
 
             if(pageX > x && pageY == y) {
-                this.direction = 'East';
+                this.direction = 'E';
             }
             else if(pageX < x && pageY == y) {
-                this.direction = 'West';
+                this.direction = 'W';
             }
             else if(pageX == x && pageY > y) {
-                this.direction = 'South';
+                this.direction = 'S';
             }
             else if(pageX == x && pageY < y) {
-                this.direction = 'North';
+                this.direction = 'N';
             }
         }
         this.oldX = e.pageX;
@@ -120,18 +118,18 @@ export class DrawSystem {
         const y = e.y - this.canvas.getBoundingClientRect().top;
         const { direction, startPoint } = this;
     
-        if(['East', 'West'].includes(direction)) {
+        if(['E', 'W'].includes(direction)) {
             if(this.linePos.y != this.canvas.height && this.linePos.y != 0 
-                && ((direction === 'East' && x >= this.linePos.x) 
-                || (direction === 'West' && x <= this.linePos.x))) {
+                && ((direction === 'E' && x >= this.linePos.x) 
+                || (direction === 'W' && x <= this.linePos.x))) {
 
                     this.linePos = { x: x, y: startPoint.y };
             }
         }
-        else if(['South', 'North'].includes(direction)) {
+        else if(['S', 'N'].includes(direction)) {
             if(this.linePos.x != this.canvas.width && this.linePos.x != 0
-                && ((direction === 'South' && y >= this.linePos.y) 
-                || (direction === 'North' && y <= this.linePos.y))) {
+                && ((direction === 'S' && y >= this.linePos.y) 
+                || (direction === 'N' && y <= this.linePos.y))) {
 
                 this.linePos = { x: startPoint.x, y: y };
             }
@@ -167,7 +165,7 @@ export class DrawSystem {
             end: {...this.linePos},
         };
 
-        if(!this.grid.isIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {       
+        if(!this.grid.isLineIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {       
             this.lineColor = 'black';
         }
         else {
@@ -195,11 +193,11 @@ export class DrawSystem {
             }
 
             if(length > 0.85 && this.linePos.x <= this.canvas.width && this.linePos.y <= this.canvas.height
-                && this.linePos.x >= 0 && this.linePos.y >= 0 && !this.grid.isIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {
+                && this.linePos.x >= 0 && this.linePos.y >= 0 && !this.grid.isLineIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {
                 this.linePos.x = startPoint.x + maxLineLength * dir.x;
                 this.linePos.y = startPoint.y + maxLineLength * dir.y;
             
-                this.grid.updateGridCollections(line);
+                this.grid.updateCollections(line);
             }
             else {
                 console.warn('Line is not valid');
@@ -212,6 +210,8 @@ export class DrawSystem {
         this.canvas.clear();
         this.drawPreviousLines();
         this.drawGrid();
+        // FOR NOW
+        this.drawAStarCosts();
     }
 
     reset() {
@@ -221,19 +221,6 @@ export class DrawSystem {
         this.startPoint = {x: 0, y: 0};
         this.oldX = 0;
         this.oldY = 0;
-    }
-
-    drawEdges() {
-        this.grid.edges.forEach((edge) => {
-            if(edge != null) {
-                if(edge.edgeType == 'N') {
-                    this.canvas.drawText(edge.x * this.grid.tileSize + 50, edge.y * this.grid.tileSize + 10, 'N');
-                }
-                else if(edge.edgeType == 'W') {
-                    this.canvas.drawText(edge.x * this.grid.tileSize - 10, edge.y * this.grid.tileSize + 50, 'W');
-                }
-            }
-        });
     }
 
     drawVertices() {
@@ -261,5 +248,33 @@ export class DrawSystem {
                 this.canvas.drawText(vertex.x, vertex.y - 10, vertex.moves);
             }
         });
+    }
+
+    drawAStarCosts() {
+        for(let x = 0; x < this.grid.size; x++) {
+            for(let y = 0; y < this.grid.size; y++) {
+                let tile = this.grid.tiles[x][y];
+                if(tile != this.grid.startNode && tile != this.grid.endNode) {
+                    this.canvas.drawText(tile.x * this.grid.tileSize + 10, tile.y * this.grid.tileSize + 20, tile.g, '#2C3E50');
+                    this.canvas.drawText(tile.x * this.grid.tileSize + 70, tile.y * this.grid.tileSize + 20, tile.h, '#2C3E50');
+                    this.canvas.drawText(tile.x * this.grid.tileSize + 40, tile.y * this.grid.tileSize + 50, tile.f, '#2C3E50');
+                }
+            }
+        }
+    }
+
+    selectTileOnClick(e) {
+        const {grid, canvas} = this;
+
+        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
+        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
+        const tile = grid.getTile(x, y);
+        grid.startNode = tile;
+
+        let path = grid.getAStarPath();
+
+        path.forEach((p) => {
+            this.canvas.colorPath2D(p.path, '#58D68D');
+        })
     }
 }
