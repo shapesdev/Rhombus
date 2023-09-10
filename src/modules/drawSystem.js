@@ -198,10 +198,10 @@ export class DrawSystem {
 
             if(length > 0.85 && this.linePos.x <= this.canvas.width && this.linePos.y <= this.canvas.height
                 && this.linePos.x >= 0 && this.linePos.y >= 0 && !this.grid.isLineIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {
-                this.linePos.x = startPoint.x + maxLineLength * dir.x;
-                this.linePos.y = startPoint.y + maxLineLength * dir.y;
+                line.end.x = startPoint.x + maxLineLength * dir.x;
+                line.end.y = startPoint.y + maxLineLength * dir.y;
             
-                this.grid.updateData(line, dir);
+                this.grid.update(line, dir);
             }
             else {
                 console.warn('Line is not valid');

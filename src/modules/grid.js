@@ -43,8 +43,7 @@ export class Grid {
     }
 
     getVertex(x, y) {
-        let vert = this.vertices.find(p => p.x == x && p.y == y);
-        return vert;
+        return this.vertices.find(p => p.x == x && p.y == y);
     }
 
     getTile(x, y) {
@@ -125,7 +124,7 @@ export class Grid {
         return intersecting;
     }
 
-    updateData(line, dir) {
+    update(line, dir) {
         this.lines.push(line);
         this.updateVertices();
         this.checkPathfinding(line, dir);
@@ -152,31 +151,25 @@ export class Grid {
             edge.tile1.neighbors.splice(edge.tile1.neighbors.indexOf(edge.tile2), 1);
             edge.tile2.neighbors.splice(edge.tile2.neighbors.indexOf(edge.tile1), 1);
             
-            if(this.isPathPossible(edge.tile1, edge.tile2)) {
-                console.log('yes');
+            if(!this.isPathPossible(edge.tile1, edge.tile2)) {
+                this.updateTilePaths(edge);
             }
-            else {
-                console.log(edge.tile1);
-                console.log(edge.tile2);
-                let tileCollection = this.iterateAllNeighbors(edge.tile1);
-                let tileCollection2 = this.iterateAllNeighbors(edge.tile2);
+        }
+    }
 
-                if(tileCollection.length < tileCollection2.length) {
-                    for(const tile of tileCollection) {
-                        tile.isFilled = true;
-                    }
-                }
-                else {
-                    for(const tile of tileCollection2) {
-                        tile.isFilled = true;
-                    }
-                }
+    updateTilePaths(edge) {
+        let collection1 = this.iterateAllNeighbors(edge.tile1);
+        let collection2 = this.iterateAllNeighbors(edge.tile2);
 
-                for (let x = 0; x < this.size; x++) {
-                    for (let y = 0; y < this.size; y++) {
-                        this.tiles[x][y].isChecked = false;
-                    }
-                }
+        let collectionToIterate = collection1.length < collection2.length ? collection1 : collection2;
+
+        for(const tile of collectionToIterate) {
+            tile.isFilled = true;
+        }
+
+        for (let x = 0; x < this.size; x++) {
+            for (let y = 0; y < this.size; y++) {
+                this.tiles[x][y].isChecked = false;
             }
         }
     }
@@ -247,6 +240,7 @@ export class Grid {
             this.setLegalMoveCount(vert);
         });
         this.totalLegalMoves /= 2; // Divide it, since it includes both directions
+        //console.log(this.totalLegalMoves);
     }
 
     setLegalMoveCount(vert) {
