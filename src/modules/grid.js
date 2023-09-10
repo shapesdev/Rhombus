@@ -158,12 +158,12 @@ export class Grid {
     }
 
     updateTilePaths(edge) {
-        let collection1 = this.iterateAllNeighbors(edge.tile1);
-        let collection2 = this.iterateAllNeighbors(edge.tile2);
+        let arr1 = this.getNeighbors(edge.tile1);
+        let arr2 = this.getNeighbors(edge.tile2);
 
-        let collectionToIterate = collection1.length < collection2.length ? collection1 : collection2;
+        let arr = arr1.length < arr2.length ? arr1 : arr2;
 
-        for(const tile of collectionToIterate) {
+        for(const tile of arr) {
             tile.isFilled = true;
         }
 
@@ -174,16 +174,16 @@ export class Grid {
         }
     }
 
-    iterateAllNeighbors(tile) {
+    getNeighbors(tile) {
         const queue = [tile];
-        const tileCollection = [];
+        const arr = [];
 
         while(queue.length > 0) {
             const tile = queue.shift();
 
             if(!tile.isChecked) {
                 tile.isChecked = true;
-                tileCollection.push(tile);
+                arr.push(tile);
 
                 for(const neighbor of tile.neighbors) {
                     if(!neighbor.isChecked) {
@@ -192,7 +192,7 @@ export class Grid {
                 }
             }
         }
-        return tileCollection;
+        return arr;
     }
 
     isPathPossible(startNode, endNode) {
