@@ -37,6 +37,9 @@ export class DrawSystem {
         for(let i = 0; i < grid.size; i++) {
             for(let j = 0; j < grid.size; j++) {
                 grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
+                if(grid.tiles[i][j].isFilled) {
+                    this.canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(128, 231, 143, 0.9)');
+                }
             }
         }
         //this.drawVertices();
@@ -203,7 +206,7 @@ export class DrawSystem {
             else {
                 console.warn('Line is not valid');
             }
-            //this.clear();
+            this.clear();
         }
     }
 

@@ -8,6 +8,7 @@ export class Tile {
         this.f = 0;
         this.nextOnPath = null;
         this.neighbors = [];
+        this.isChecked = false;
         this.isFilled = false;
     }
 }
@@ -38,8 +39,6 @@ export class Grid {
             S: {x: 0, y: 1},
             W: {x: -1, y: 0},
         };
-/*         this.startNode = null;
-        this.endNode = null; */
         this.init();
     }
 
@@ -153,8 +152,54 @@ export class Grid {
             edge.tile1.neighbors.splice(edge.tile1.neighbors.indexOf(edge.tile2), 1);
             edge.tile2.neighbors.splice(edge.tile2.neighbors.indexOf(edge.tile1), 1);
             
-            this.isPathPossible(edge.tile1, edge.tile2);
+            if(this.isPathPossible(edge.tile1, edge.tile2)) {
+                console.log('yes');
+            }
+            else {
+                console.log(edge.tile1);
+                console.log(edge.tile2);
+                let tileCollection = this.iterateAllNeighbors(edge.tile1);
+                let tileCollection2 = this.iterateAllNeighbors(edge.tile2);
+
+                if(tileCollection.length < tileCollection2.length) {
+                    for(const tile of tileCollection) {
+                        tile.isFilled = true;
+                    }
+                }
+                else {
+                    for(const tile of tileCollection2) {
+                        tile.isFilled = true;
+                    }
+                }
+
+                for (let x = 0; x < this.size; x++) {
+                    for (let y = 0; y < this.size; y++) {
+                        this.tiles[x][y].isChecked = false;
+                    }
+                }
+            }
         }
+    }
+
+    iterateAllNeighbors(tile) {
+        const queue = [tile];
+        const tileCollection = [];
+
+        while(queue.length > 0) {
+            const tile = queue.shift();
+
+            if(!tile.isChecked) {
+                tile.isChecked = true;
+                tileCollection.push(tile);
+
+                for(const neighbor of tile.neighbors) {
+                    if(!neighbor.isChecked) {
+                        queue.push(neighbor);
+                    }
+                }
+            }
+        }
+        return tileCollection;
     }
 
     isPathPossible(startNode, endNode) {
@@ -193,26 +238,7 @@ export class Grid {
                 });
             }
         }
-
-        console.log(pathPossible);
-        if(pathPossible == false) {
-            console.log(startNode);
-            console.log(endNode);
-        }
-
-/*         if(pathPossible) {
-            const shortestPath = [];
-            let current = this.endNode;
-            while(current !== this.startNode) {
-                shortestPath.unshift(current);
-                current = current.nextOnPath;
-            }
-            shortestPath.unshift(this.startNode);
-            return shortestPath;
-        }
-        else {
-            return [];
-        } */
+        return pathPossible;
     }
 
     updateVertices() {
@@ -221,7 +247,6 @@ export class Grid {
             this.setLegalMoveCount(vert);
         });
         this.totalLegalMoves /= 2; // Divide it, since it includes both directions
-        //console.log(`POSSIBLE MOVES LEFT: ${this.totalLegalMoves}`);
     }
 
     setLegalMoveCount(vert) {
