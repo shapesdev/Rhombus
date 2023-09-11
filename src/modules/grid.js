@@ -216,7 +216,6 @@ export class Grid {
             this.setLegalMoveCount(vert);
         });
         this.totalLegalMoves /= 2; // Divide it, since it includes both directions
-        console.log(this.totalLegalMoves);
     }
 
     setLegalMoveCount(vert) {

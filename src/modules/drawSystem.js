@@ -40,6 +40,9 @@ export class DrawSystem {
                 if(grid.tiles[i][j].isFilled) {
                     this.canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(128, 231, 143, 0.9)');
                 }
+                else if(grid.totalLegalMoves == 0) {
+                    this.canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
+                }
             }
         }
         //this.drawVertices();
