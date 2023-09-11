@@ -24,7 +24,7 @@ export class Edge {
 }
 
 export class Vertex {
-    contructor(x, y) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
         this.moves = 0;
@@ -107,9 +107,7 @@ export class Grid {
                     }
                 }
                 if(!(x == 0 && y == 0) && !(x == size && y == 0) && !(x == 0 && y == size) && !(x == size && y == size)) {
-                    //this.vertices.push({x: x * tileSize, y: y * tileSize, moves: 0});
-                    let vertex = new Vertex(x * tileSize, y * tileSize);
-                    this.vertices.push(vertex);
+                    this.vertices.push(new Vertex(x * tileSize, y * tileSize));
                 }
             }
         }
