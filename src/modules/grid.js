@@ -107,7 +107,9 @@ export class Grid {
                     }
                 }
                 if(!(x == 0 && y == 0) && !(x == size && y == 0) && !(x == 0 && y == size) && !(x == size && y == size)) {
-                    this.vertices.push(new Vertex(x * tileSize, y * tileSize));
+                    let vert = new Vertex(x * tileSize, y * tileSize);
+                    this.vertices.push(vert);
+                    //console.log(`${x} & ${y} - have this vertex ${x * tileSize} ${y * tileSize}`);
                 }
             }
         }
@@ -121,42 +123,8 @@ export class Grid {
 
     update(line, dir) {
         this.lines.push(line);
-        this.updateVertices();
         this.checkPathfinding(line, dir);
-    }
-
-    isLineIntersecting(x1, x2, y1, y2) {
-        let intersecting = false;
-        let x3, x4, y3, y4;
-        if(this.lines.length > 0) {
-            this.lines.forEach((l) => {
-                x3 = l.start.x;
-                y3 = l.start.y;
-                x4 = l.end.x;
-                y4 = l.end.y;
-
-                if(Math.max(x1, x2) > Math.min(x3, x4) &&
-                   Math.min(x1, x2) < Math.max(x3, x4) && y1 == y3 && y2 == y4) {
-                    intersecting = true;
-                }
-                else if(Math.max(y1, y2) > Math.min(y3, y4) &&
-                        Math.min(y1, y2) < Math.max(y3, y4) && x1 == x3 && x2 == x4) {
-                    intersecting = true;
-                }
-        
-                let t = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4)) /
-                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-                
-                let u = ((x1 - x3)*(y1 - y2) - (y1 - y3)*(x1 - x2)) /
-                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
-        
-
-                if(t > 0 && t < 1 && u > 0 && u < 1) {
-                    intersecting = true;
-                }
-            });
-        }
-        return intersecting;
+        this.updateVertices();
     }
 
     checkPathfinding(line, dir) {
@@ -245,7 +213,6 @@ export class Grid {
     updateVertices() {
         this.totalLegalMoves = 0;
         this.vertices.forEach((vert) => {
-            console.log(vert.x);
             this.setLegalMoveCount(vert);
         });
         this.totalLegalMoves /= 2; // Divide it, since it includes both directions
@@ -267,12 +234,67 @@ export class Grid {
             let end = this.getVertex(vert.x + (3 * this.tileSize * x), vert.y + (3 * this.tileSize * y));
 
             if(end) {
-                if(!this.isLineIntersecting(vert.x, end.x, vert.y, end.y)) {
+                if(this.isLineValid(vert.x, end.x, vert.y, end.y, {x, y})) {
                     count++;
                 }
             }
         }
         vert.moves = count;
         this.totalLegalMoves += count;
+    }
+
+    isLineValid(x1, x2, y1, y2, dir) {
+        let mid = {x: x1 + 200 * dir.x, y: y1 + 200 * dir.y};
+        if((!this.isLineIntersecting(x1, x2, y1, y2)) && (!this.isWithinFilledArea(mid))) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    isLineIntersecting(x1, x2, y1, y2) {
+        let intersecting = false;
+        let x3, x4, y3, y4;
+        if(this.lines.length > 0) {
+            this.lines.forEach((l) => {
+                x3 = l.start.x;
+                y3 = l.start.y;
+                x4 = l.end.x;
+                y4 = l.end.y;
+
+                if(Math.max(x1, x2) > Math.min(x3, x4) &&
+                   Math.min(x1, x2) < Math.max(x3, x4) && y1 == y3 && y2 == y4) {
+                    intersecting = true;
+                }
+                else if(Math.max(y1, y2) > Math.min(y3, y4) &&
+                        Math.min(y1, y2) < Math.max(y3, y4) && x1 == x3 && x2 == x4) {
+                    intersecting = true;
+                }
+        
+                let t = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4)) /
+                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+                
+                let u = ((x1 - x3)*(y1 - y2) - (y1 - y3)*(x1 - x2)) /
+                ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4));
+        
+
+                if(t > 0 && t < 1 && u > 0 && u < 1) {
+                    intersecting = true;
+                }
+            });
+        }
+        return intersecting;
+    }
+
+    isWithinFilledArea(vert) {
+        let x = vert.x / this.tileSize;
+        let y = vert.y / this.tileSize;
+        if(x < this.size && y < this.size) {
+            if(this.tiles[x][y].isFilled) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -169,11 +169,15 @@ export class DrawSystem {
             end: {...this.linePos},
         };
 
-        if(!this.grid.isLineIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {       
-            this.lineColor = 'black';
-        }
-        else {
-            this.lineColor = 'red';
+        const dir = this.grid.directionMap[this.direction];
+
+        if(dir) {
+            if(this.grid.isLineValid(line.start.x, line.end.x, line.start.y, line.end.y, dir)) {       
+                this.lineColor = 'black';
+            }
+            else {
+                this.lineColor = 'red';
+            }
         }
     }
 
@@ -190,17 +194,17 @@ export class DrawSystem {
             let length;
 
             if(dir.x !== 0) {
-                length = Math.abs(this.linePos.x - startPoint.x) / maxLineLength;
+                length = Math.abs(line.end.x - line.start.x) / maxLineLength;
             }
             else {
-                length = Math.abs(this.linePos.y - startPoint.y) / maxLineLength;
+                length = Math.abs(line.end.y - line.start.y) / maxLineLength;
             }
 
-            if(length > 0.85 && this.linePos.x <= this.canvas.width && this.linePos.y <= this.canvas.height
-                && this.linePos.x >= 0 && this.linePos.y >= 0 && !this.grid.isLineIntersecting(line.start.x, line.end.x, line.start.y, line.end.y)) {
-                line.end.x = startPoint.x + maxLineLength * dir.x;
-                line.end.y = startPoint.y + maxLineLength * dir.y;
-            
+            if(length > 0.85 && line.end.x <= this.canvas.width && line.end.y <= this.canvas.height
+            && line.end.x >= 0 && line.end.y >= 0 && this.grid.isLineValid(line.start.x, line.end.x, line.start.y, line.end.y, dir)) {          
+         
+                line.end.x = line.start.x + maxLineLength * dir.x;
+                line.end.y = line.start.y + maxLineLength * dir.y;
                 this.grid.update(line, dir);
             }
             else {
