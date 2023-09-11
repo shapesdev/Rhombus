@@ -23,6 +23,14 @@ export class Edge {
     }
 }
 
+export class Vertex {
+    contructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.moves = 0;
+    }
+}
+
 
 export class Grid {
     constructor(size, tileSize) {
@@ -54,6 +62,27 @@ export class Grid {
         return this.edges.find(e => e.x == x && e.y == y && e.edgeType == edgeType);
     }
 
+    getTileNeighbors(tile) {
+        const queue = [tile];
+        const arr = [];
+
+        while(queue.length > 0) {
+            const tile = queue.shift();
+
+            if(!tile.isChecked) {
+                tile.isChecked = true;
+                arr.push(tile);
+
+                for(const neighbor of tile.neighbors) {
+                    if(!neighbor.isChecked) {
+                        queue.push(neighbor);
+                    }
+                }
+            }
+        }
+        return arr;
+    }
+
     init() {
         this.generate();
     }
@@ -78,7 +107,9 @@ export class Grid {
                     }
                 }
                 if(!(x == 0 && y == 0) && !(x == size && y == 0) && !(x == 0 && y == size) && !(x == size && y == size)) {
-                    this.vertices.push({x: x * tileSize, y: y * tileSize, moves: 0});
+                    //this.vertices.push({x: x * tileSize, y: y * tileSize, moves: 0});
+                    let vertex = new Vertex(x * tileSize, y * tileSize);
+                    this.vertices.push(vertex);
                 }
             }
         }
@@ -88,6 +119,12 @@ export class Grid {
     makeNeighbors(t1, t2) {
         t1.neighbors.push(t2);
         t2.neighbors.push(t1);
+    }
+
+    update(line, dir) {
+        this.lines.push(line);
+        this.updateVertices();
+        this.checkPathfinding(line, dir);
     }
 
     isLineIntersecting(x1, x2, y1, y2) {
@@ -124,12 +161,6 @@ export class Grid {
         return intersecting;
     }
 
-    update(line, dir) {
-        this.lines.push(line);
-        this.updateVertices();
-        this.checkPathfinding(line, dir);
-    }
-
     checkPathfinding(line, dir) {
         let x = line.start.x;
         let y = line.start.y;
@@ -158,8 +189,8 @@ export class Grid {
     }
 
     updateTilePaths(edge) {
-        let arr1 = this.getNeighbors(edge.tile1);
-        let arr2 = this.getNeighbors(edge.tile2);
+        let arr1 = this.getTileNeighbors(edge.tile1);
+        let arr2 = this.getTileNeighbors(edge.tile2);
 
         let arr = arr1.length < arr2.length ? arr1 : arr2;
 
@@ -172,27 +203,6 @@ export class Grid {
                 this.tiles[x][y].isChecked = false;
             }
         }
-    }
-
-    getNeighbors(tile) {
-        const queue = [tile];
-        const arr = [];
-
-        while(queue.length > 0) {
-            const tile = queue.shift();
-
-            if(!tile.isChecked) {
-                tile.isChecked = true;
-                arr.push(tile);
-
-                for(const neighbor of tile.neighbors) {
-                    if(!neighbor.isChecked) {
-                        queue.push(neighbor);
-                    }
-                }
-            }
-        }
-        return arr;
     }
 
     isPathPossible(startNode, endNode) {
@@ -237,10 +247,11 @@ export class Grid {
     updateVertices() {
         this.totalLegalMoves = 0;
         this.vertices.forEach((vert) => {
+            console.log(vert.x);
             this.setLegalMoveCount(vert);
         });
         this.totalLegalMoves /= 2; // Divide it, since it includes both directions
-        //console.log(this.totalLegalMoves);
+        console.log(this.totalLegalMoves);
     }
 
     setLegalMoveCount(vert) {
