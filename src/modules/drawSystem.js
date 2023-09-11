@@ -22,7 +22,7 @@ export class DrawSystem {
     }
     
     draw(e) {
-        if(e.buttons !== 1) return;
+        if(e.buttons !== 1 || this.grid.totalLegalMoves == 0) return;
         this.setDirection(e);
         this.setStartPoint(e);
         this.setPosition(e);
