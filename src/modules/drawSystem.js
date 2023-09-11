@@ -38,10 +38,10 @@ export class DrawSystem {
             for(let j = 0; j < grid.size; j++) {
                 grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
                 if(grid.tiles[i][j].isFilled) {
-                    this.canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(128, 231, 143, 0.9)');
+                    canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(128, 231, 143, 0.9)');
                 }
                 else if(grid.totalLegalMoves == 0) {
-                    this.canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
+                    canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
                 }
             }
         }
@@ -50,22 +50,13 @@ export class DrawSystem {
         //this.drawEdges();
     }
 
-    colorTileOnClick(e) {
-        const {grid, canvas} = this;
-
-        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
-        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
-        const tile = grid.getTile(x, y);
-        canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
-    }
-
     drawPath2D(e) {
         const {grid, canvas} = this;
 
         const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
         const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
         const tile = grid.getTile(x, y);
-        canvas.drawPoint(tile.x * this.grid.tileSize + 50, tile.y * this.grid.tileSize + 50, 8);
+        canvas.drawPoint(tile.x * grid.tileSize + 50, tile.y * grid.tileSize + 50, 8);
     }
 
     drawPreviousLines() {
@@ -121,22 +112,23 @@ export class DrawSystem {
     }
 
     setPosition(e) {
-        const x = e.x - this.canvas.getBoundingClientRect().left;
-        const y = e.y - this.canvas.getBoundingClientRect().top;
-        const { direction, startPoint } = this;
+        const { direction, startPoint, canvas } = this;
+
+        const x = e.x - canvas.getBoundingClientRect().left;
+        const y = e.y - canvas.getBoundingClientRect().top;
     
         if(['E', 'W'].includes(direction)) {
-            if(this.linePos.y != this.canvas.height && this.linePos.y != 0 
-                && ((direction === 'E' && x >= this.linePos.x) 
-                || (direction === 'W' && x <= this.linePos.x))) {
+            if(this.linePos.y != canvas.height && this.linePos.y != 0 
+            && ((direction === 'E' && x >= this.linePos.x) 
+            || (direction === 'W' && x <= this.linePos.x))) {
 
-                    this.linePos = { x: x, y: startPoint.y };
+                this.linePos = { x: x, y: startPoint.y };
             }
         }
         else if(['S', 'N'].includes(direction)) {
-            if(this.linePos.x != this.canvas.width && this.linePos.x != 0
-                && ((direction === 'S' && y >= this.linePos.y) 
-                || (direction === 'N' && y <= this.linePos.y))) {
+            if(this.linePos.x != canvas.width && this.linePos.x != 0
+            && ((direction === 'S' && y >= this.linePos.y) 
+            || (direction === 'N' && y <= this.linePos.y))) {
 
                 this.linePos = { x: startPoint.x, y: y };
             }
@@ -299,5 +291,14 @@ export class DrawSystem {
         path.forEach((p) => {
             this.canvas.colorPath2D(p.path, '#58D68D');
         })
+    }
+
+    colorTileOnClick(e) {
+        const {grid, canvas} = this;
+
+        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
+        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
+        const tile = grid.getTile(x, y);
+        canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
     }
 }

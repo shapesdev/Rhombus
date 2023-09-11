@@ -28,6 +28,7 @@ export class Vertex {
         this.x = x;
         this.y = y;
         this.moves = 0;
+        this.hasLine = false;
     }
 }
 
@@ -107,9 +108,7 @@ export class Grid {
                     }
                 }
                 if(!(x == 0 && y == 0) && !(x == size && y == 0) && !(x == 0 && y == size) && !(x == size && y == size)) {
-                    let vert = new Vertex(x * tileSize, y * tileSize);
-                    this.vertices.push(vert);
-                    //console.log(`${x} & ${y} - have this vertex ${x * tileSize} ${y * tileSize}`);
+                    this.vertices.push(new Vertex(x * tileSize, y * tileSize));
                 }
             }
         }
@@ -223,19 +222,15 @@ export class Grid {
         for(const direction in this.directionMap) {
             const {x, y} = this.directionMap[direction];
 
-            if(x == 0 && (vert.x == 0 || vert.x == this.size * this.tileSize)) {
-                continue;
-            }
-            else if(y == 0 && (vert.y == 0 || vert.y == this.size * this.tileSize)) {
+            if((x == 0 && (vert.x == 0 || vert.x == this.size * this.tileSize)) ||
+               (y == 0 && (vert.y == 0 || vert.y == this.size * this.tileSize))) {
                 continue;
             }
 
-            let end = this.getVertex(vert.x + (3 * this.tileSize * x), vert.y + (3 * this.tileSize * y));
+            const end = this.getVertex(vert.x + (3 * this.tileSize * x), vert.y + (3 * this.tileSize * y));
 
-            if(end) {
-                if(this.isLineValid(vert.x, end.x, vert.y, end.y, {x, y})) {
-                    count++;
-                }
+            if(end && this.isLineValid(vert.x, end.x, vert.y, end.y, {x, y})) {
+                count++;
             }
         }
         vert.moves = count;
@@ -243,13 +238,8 @@ export class Grid {
     }
 
     isLineValid(x1, x2, y1, y2, dir) {
-        let mid = {x: x1 + 200 * dir.x, y: y1 + 200 * dir.y};
-        if((!this.isLineIntersecting(x1, x2, y1, y2)) && (!this.isWithinFilledArea(mid))) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        const mid = this.getVertex(x1 + this.tileSize * 2 * dir.x, y1 + this.tileSize * 2 * dir.y);
+        return !this.isLineIntersecting(x1, x2, y1, y2) && !this.isWithinFilledArea(mid);
     }
 
     isLineIntersecting(x1, x2, y1, y2) {
