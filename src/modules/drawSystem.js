@@ -45,9 +45,6 @@ export class DrawSystem {
                 }
             }
         }
-        //this.drawVertices();
-        //this.drawVerticesLegalMoves();
-        //this.drawEdges();
     }
 
     drawPath2D(e) {
@@ -222,83 +219,5 @@ export class DrawSystem {
         this.startPoint = {x: 0, y: 0};
         this.oldX = 0;
         this.oldY = 0;
-    }
-
-    drawVertices() {
-        let fillColor;
-        this.grid.vertices.forEach((vertex) => {
-            if(vertex.moves == 0) {
-                fillColor = 'red';
-            }
-            else {
-                fillColor = '#11EE28';
-            }
-            this.canvas.drawPoint(vertex.x, vertex.y, 10, fillColor);
-        });
-    }
-
-    drawVerticesLegalMoves() {
-        this.grid.vertices.forEach((vertex) => {
-            if(vertex.x > 300 && vertex.y > 100) {
-                this.canvas.drawText(vertex.x - 10, vertex.y - 10, vertex.moves);
-            }
-            else if(vertex.y < 100) {
-                this.canvas.drawText(vertex.x, vertex.y + 15, vertex.moves);
-            }
-            else {
-                this.canvas.drawText(vertex.x, vertex.y - 10, vertex.moves);
-            }
-        });
-    }
-
-    
-    drawEdges() {
-        this.grid.edges.forEach((edge) => {
-            if(edge != null) {
-                if(edge.edgeType == 'N') {
-                    this.canvas.drawText(edge.x * this.grid.tileSize + 50, edge.y * this.grid.tileSize + 10, 'N');
-                }
-                else if(edge.edgeType == 'W') {
-                    this.canvas.drawText(edge.x * this.grid.tileSize - 10, edge.y * this.grid.tileSize + 50, 'W');
-                }
-            }
-        });
-    }
-
-    drawAStarCosts() {
-        for(let x = 0; x < this.grid.size; x++) {
-            for(let y = 0; y < this.grid.size; y++) {
-                let tile = this.grid.tiles[x][y];
-                if(tile != this.grid.startNode && tile != this.grid.endNode) {
-                    this.canvas.drawText(tile.x * this.grid.tileSize + 10, tile.y * this.grid.tileSize + 20, tile.g, '#2C3E50');
-                    this.canvas.drawText(tile.x * this.grid.tileSize + 70, tile.y * this.grid.tileSize + 20, tile.h, '#2C3E50');
-                    this.canvas.drawText(tile.x * this.grid.tileSize + 40, tile.y * this.grid.tileSize + 50, tile.f, '#2C3E50');
-                }
-            }
-        }
-    }
-
-    selectTileOnClick(e) {
-        const {grid, canvas} = this;
-
-        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
-        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
-        const tile = grid.getTile(x, y);
-        grid.startNode = tile;
-
-        let path = grid.isPathPossible();
-
-        path.forEach((p) => {
-            this.canvas.colorPath2D(p.path, '#58D68D');
-        })
-    }
-
-    colorTileOnClick(e) {
-        const {grid, canvas} = this;
-
-        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
-        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
-        const tile = grid.getTile(x, y);
-        canvas.colorPath2D(tile.path, 'rgba(128, 231, 143, 0.9)');
     }
 }

@@ -1,4 +1,4 @@
-export class Tile {
+class Tile {
     constructor(x, y, path = null) {
         this.x = x;
         this.y = y;
@@ -13,7 +13,7 @@ export class Tile {
     }
 }
 
-export class Edge {
+class Edge {
     constructor(x, y, edgeType, tile1, tile2) {
         this.x = x;
         this.y = y;
@@ -23,7 +23,7 @@ export class Edge {
     }
 }
 
-export class Vertex {
+class Vertex {
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -120,7 +120,8 @@ export class Grid {
     }
 
     update(line, dir) {
-        this.updateLines(line);
+        //this.updateLines(line); NEED TO FIX ENDPOINTS
+        this.lines.push(line);
         this.updatePathfinding(line, dir);
         this.updateVertices();
     }
@@ -207,6 +208,7 @@ export class Grid {
                 if(arr1.length != 0 && arr2.length != 0) {
                     let arr = arr1.length < arr2.length ? arr1 : arr2;
                     this.updateTilePaths(arr);
+                    console.log(`Points the player should get: ${arr.length}`);
                 }
             }
         }
