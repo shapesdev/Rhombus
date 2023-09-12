@@ -122,14 +122,15 @@ export class Grid {
 
     update(line, dir) {
         this.lines.push(line);
-        this.checkPathfinding(line, dir);
+        this.updatePathfinding(line, dir);
         this.updateVertices();
     }
 
-    checkPathfinding(line, dir) {
+    updatePathfinding(line, dir) {
         let x = line.start.x;
         let y = line.start.y;
         let edgeType = dir.x == 0 ? 'W' : 'N';
+        let tempTiles = [];
 
         for(let i = 0; i <= 2; i++) {
             let newX = (x + i * dir.x * this.tileSize) / this.tileSize;
@@ -146,19 +147,25 @@ export class Grid {
 
             edge.tile1.neighbors.splice(edge.tile1.neighbors.indexOf(edge.tile2), 1);
             edge.tile2.neighbors.splice(edge.tile2.neighbors.indexOf(edge.tile1), 1);
-            
-            if(!this.isPathPossible(edge.tile1, edge.tile2)) {
-                this.updateTilePaths(edge);
+
+            tempTiles.push(edge.tile1);
+            tempTiles.push(edge.tile2);
+        }
+
+        for(let i = 0; i < tempTiles.length; i+=2) {
+            if(!this.isPathPossible(tempTiles[i], tempTiles[i + 1])) {
+                let arr1 = this.getTileNeighbors(tempTiles[i]);
+                let arr2 = this.getTileNeighbors(tempTiles[i+1]);
+                if(arr1.length != 0 && arr2.length != 0) {
+                    let arr = arr1.length < arr2.length ? arr1 : arr2;
+                    this.updateTilePaths(arr);
+                }
             }
         }
     }
 
-    updateTilePaths(edge) {
-        let arr1 = this.getTileNeighbors(edge.tile1);
-        let arr2 = this.getTileNeighbors(edge.tile2);
-
-        let arr = arr1.length < arr2.length ? arr1 : arr2;
-
+        
+    updateTilePaths(arr) {
         for(const tile of arr) {
             tile.isFilled = true;
         }
@@ -168,6 +175,14 @@ export class Grid {
                 this.tiles[x][y].isChecked = false;
             }
         }
+    }
+
+    updateVertices() {
+        this.totalLegalMoves = 0;
+        this.vertices.forEach((vert) => {
+            this.setLegalMoveCount(vert);
+        });
+        this.totalLegalMoves /= 2; // Divide it, since it includes both directions
     }
 
     isPathPossible(startNode, endNode) {
@@ -207,14 +222,6 @@ export class Grid {
             }
         }
         return pathPossible;
-    }
-
-    updateVertices() {
-        this.totalLegalMoves = 0;
-        this.vertices.forEach((vert) => {
-            this.setLegalMoveCount(vert);
-        });
-        this.totalLegalMoves /= 2; // Divide it, since it includes both directions
     }
 
     setLegalMoveCount(vert) {
