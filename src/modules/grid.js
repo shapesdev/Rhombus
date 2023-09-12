@@ -122,11 +122,11 @@ export class Grid {
 
     update(line, dir) {
         this.lines.push(line);
-        this.updatePathfinding(line, dir);
+        this.checkPathfinding(line, dir);
         this.updateVertices();
     }
 
-    updatePathfinding(line, dir) {
+    checkPathfinding(line, dir) {
         let x = line.start.x;
         let y = line.start.y;
         let edgeType = dir.x == 0 ? 'W' : 'N';
@@ -147,20 +147,39 @@ export class Grid {
 
             edge.tile1.neighbors.splice(edge.tile1.neighbors.indexOf(edge.tile2), 1);
             edge.tile2.neighbors.splice(edge.tile2.neighbors.indexOf(edge.tile1), 1);
-
             tempTiles.push(edge.tile1);
             tempTiles.push(edge.tile2);
         }
+        this.updateTilesSeparately(tempTiles);
+    }
 
+    updateTilesSeparately(tempTiles) {
         for(let i = 0; i < tempTiles.length; i+=2) {
             if(!this.isPathPossible(tempTiles[i], tempTiles[i + 1])) {
                 let arr1 = this.getTileNeighbors(tempTiles[i]);
                 let arr2 = this.getTileNeighbors(tempTiles[i+1]);
                 if(arr1.length != 0 && arr2.length != 0) {
                     let arr = arr1.length < arr2.length ? arr1 : arr2;
+                    console.log(`smaller array length is: ${arr.length}`)
                     this.updateTilePaths(arr);
                 }
             }
+        }
+    }
+
+    updateTilesCombined(tempTiles) {
+        let leftArr = [];
+        let rightArr = [];
+
+        for(let i = 0; i < tempTiles.length; i+=2) {
+            if(!this.isPathPossible(tempTiles[i], tempTiles[i + 1])) {
+                leftArr = leftArr.concat(this.getTileNeighbors(tempTiles[i]));
+                rightArr = rightArr.concat(this.getTileNeighbors(tempTiles[i + 1]));
+            }
+        }
+        if(leftArr.length != 0 && rightArr.length != 0) {
+            let arr = leftArr.length < rightArr.length ? leftArr : rightArr;
+            this.updateTilePaths(arr);
         }
     }
 
@@ -183,6 +202,7 @@ export class Grid {
             this.setLegalMoveCount(vert);
         });
         this.totalLegalMoves /= 2; // Divide it, since it includes both directions
+        //console.log(this.totalLegalMoves);
     }
 
     isPathPossible(startNode, endNode) {
@@ -284,11 +304,13 @@ export class Grid {
     }
 
     isWithinFilledArea(vert) {
-        let x = vert.x / this.tileSize;
-        let y = vert.y / this.tileSize;
-        if(x < this.size && y < this.size) {
-            if(this.tiles[x][y].isFilled) {
-                return true;
+        if(vert) {
+            let x = vert.x / this.tileSize;
+            let y = vert.y / this.tileSize;
+            if(x < this.size && y < this.size) {
+                if(this.tiles[x][y].isFilled) {
+                    return true;
+                }
             }
         }
         return false;
