@@ -28,7 +28,6 @@ export class Vertex {
         this.x = x;
         this.y = y;
         this.moves = 0;
-        this.hasLine = false;
     }
 }
 
@@ -121,16 +120,63 @@ export class Grid {
     }
 
     update(line, dir) {
-        this.lines.push(line);
-        this.checkPathfinding(line, dir);
+        this.updateLines(line);
+        this.updatePathfinding(line, dir);
         this.updateVertices();
     }
 
-    checkPathfinding(line, dir) {
-        let x = line.start.x;
-        let y = line.start.y;
-        let edgeType = dir.x == 0 ? 'W' : 'N';
-        let tempTiles = [];
+    updateLines(line) {
+        const horizontalLines = [];
+        const verticalLines = [];
+        this.lines.push(line);
+
+        this.lines.forEach((line) => {
+            if (line.start.x === line.end.x) {
+                verticalLines.push(line);
+            } else {
+                horizontalLines.push(line);
+            }
+        });
+
+        // Sort and merge horizontal lines
+        horizontalLines.sort((line1, line2) => line1.start.y - line2.start.y);
+        const mergedHorizontalLines = [horizontalLines[0]];
+        for (let i = 1; i < horizontalLines.length; i++) {
+            const currentLine = horizontalLines[i];
+            const previousLine = mergedHorizontalLines[mergedHorizontalLines.length - 1];
+
+            if (currentLine.start.y === previousLine.end.y) {
+                // Lines are adjacent, merge them
+                previousLine.end = currentLine.end;
+            } else {
+                // Lines are not adjacent, add the current line to mergedHorizontalLines
+                mergedHorizontalLines.push(currentLine);
+            }
+        }
+
+        // Sort and merge vertical lines
+        verticalLines.sort((line1, line2) => line1.start.x - line2.start.x);
+        const mergedVerticalLines = [verticalLines[0]];
+        for (let i = 1; i < verticalLines.length; i++) {
+            const currentLine = verticalLines[i];
+            const previousLine = mergedVerticalLines[mergedVerticalLines.length - 1];
+
+            if (currentLine.start.x === previousLine.end.x) {
+                // Lines are adjacent, merge them
+                previousLine.end = currentLine.end;
+            } else {
+                // Lines are not adjacent, add the current line to mergedVerticalLines
+                mergedVerticalLines.push(currentLine);
+            }
+        }
+        this.lines = [...verticalLines, ...horizontalLines];
+    }
+
+    updatePathfinding(line, dir) {
+        const x = line.start.x;
+        const y = line.start.y;
+        const edgeType = dir.x == 0 ? 'W' : 'N';
+        const tempTiles = [];
 
         for(let i = 0; i <= 2; i++) {
             let newX = (x + i * dir.x * this.tileSize) / this.tileSize;
@@ -143,7 +189,7 @@ export class Grid {
                 newX--;
             }
 
-            let edge = this.getEdge(newX, newY, edgeType);
+            const edge = this.getEdge(newX, newY, edgeType);
 
             edge.tile1.neighbors.splice(edge.tile1.neighbors.indexOf(edge.tile2), 1);
             edge.tile2.neighbors.splice(edge.tile2.neighbors.indexOf(edge.tile1), 1);
@@ -153,28 +199,26 @@ export class Grid {
         this.updateTilesSeparately(tempTiles);
     }
 
-    updateTilesSeparately(tempTiles) {
-        for(let i = 0; i < tempTiles.length; i+=2) {
-            if(!this.isPathPossible(tempTiles[i], tempTiles[i + 1])) {
-                let arr1 = this.getTileNeighbors(tempTiles[i]);
-                let arr2 = this.getTileNeighbors(tempTiles[i+1]);
+    updateTilesSeparately(tiles) {
+        for(let i = 0; i < tiles.length; i+=2) {
+            if(!this.isPathPossible(tiles[i], tiles[i + 1])) {
+                let arr1 = this.getTileNeighbors(tiles[i]);
+                let arr2 = this.getTileNeighbors(tiles[i+1]);
                 if(arr1.length != 0 && arr2.length != 0) {
                     let arr = arr1.length < arr2.length ? arr1 : arr2;
-                    console.log(`smaller array length is: ${arr.length}`)
                     this.updateTilePaths(arr);
                 }
             }
         }
     }
 
-    updateTilesCombined(tempTiles) {
+    updateTilesCombined(tiles) {
         let leftArr = [];
         let rightArr = [];
-
-        for(let i = 0; i < tempTiles.length; i+=2) {
-            if(!this.isPathPossible(tempTiles[i], tempTiles[i + 1])) {
-                leftArr = leftArr.concat(this.getTileNeighbors(tempTiles[i]));
-                rightArr = rightArr.concat(this.getTileNeighbors(tempTiles[i + 1]));
+        for(let i = 0; i < tiles.length; i+=2) {
+            if(!this.isPathPossible(tiles[i], tiles[i + 1])) {
+                leftArr = leftArr.concat(this.getTileNeighbors(tiles[i]));
+                rightArr = rightArr.concat(this.getTileNeighbors(tiles[i + 1]));
             }
         }
         if(leftArr.length != 0 && rightArr.length != 0) {
@@ -184,8 +228,8 @@ export class Grid {
     }
 
         
-    updateTilePaths(arr) {
-        for(const tile of arr) {
+    updateTilePaths(tiles) {
+        for(const tile of tiles) {
             tile.isFilled = true;
         }
 
