@@ -1,5 +1,6 @@
 export class Player {
-    constructor() {
-        this.playerName = '';
+    constructor(playerName) {
+        this.playerName = playerName;
+        this.points = 0;
     }
 }

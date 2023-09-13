@@ -3,3 +3,35 @@
 #canvas {
     border: 2px solid #000000;
 }
+
+/* Center the child element both horizontally and vertically */
+.title-container {
+    display: flex;
+    justify-content: center; /* Horizontal centering */
+    align-items: center; /* Vertical centering */
+    height: 10vh; /* 100% of the viewport height */
+}
+
+/* Style the h1 element if needed */
+#title {
+    font-size: 24px;
+    /* Add any other styles you want */
+}
+
+.player-container {
+    display: flex;
+}
+
+.left-player {
+    margin-left: 0px;
+    margin-bottom: 20px;
+    font-size: 25px; /* Adjust the font size */
+    color: #000; /* Set the text color to black */
+}
+
+.right-player {
+    margin-left: 525px;
+    margin-bottom: 20px;
+    font-size: 25px; /* Adjust the font size */
+    color: #000; /* Set the text color to black */
+}

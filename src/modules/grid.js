@@ -120,9 +120,8 @@ export class Grid {
     }
 
     update(line, dir) {
-        //this.updateLines(line); NEED TO FIX ENDPOINTS
-        this.lines.push(line);
         this.updatePathfinding(line, dir);
+        this.updateLines(line);
         this.updateVertices();
     }
 
@@ -138,36 +137,61 @@ export class Grid {
                 horizontalLines.push(line);
             }
         });
+        this.lines = [];
 
         // Sort and merge horizontal lines
         horizontalLines.sort((line1, line2) => line1.start.y - line2.start.y);
-        const mergedHorizontalLines = [horizontalLines[0]];
-        for (let i = 1; i < horizontalLines.length; i++) {
-            const currentLine = horizontalLines[i];
-            const previousLine = mergedHorizontalLines[mergedHorizontalLines.length - 1];
+        for (let i = 0; i < horizontalLines.length - 1; i++) {
+            const prevLine = horizontalLines[i];
+            const nextLine = horizontalLines[i+1];
 
-            if (currentLine.start.y === previousLine.end.y) {
+            if (prevLine.start.y === nextLine.end.y &&
+            (
+                nextLine.start.x === prevLine.end.x || nextLine.end.x === prevLine.start.x ||
+                nextLine.start.x === prevLine.start.x || nextLine.end.x === prevLine.end.x
+            )) {
                 // Lines are adjacent, merge them
-                previousLine.end = currentLine.end;
-            } else {
-                // Lines are not adjacent, add the current line to mergedHorizontalLines
-                mergedHorizontalLines.push(currentLine);
+                if(nextLine.end.x === prevLine.end.x) {
+                    nextLine.end = prevLine.start;
+                }
+                else if(nextLine.start.x === prevLine.start.x) {
+                    nextLine.start = prevLine.end;
+                }
+                else if(nextLine.end.x === prevLine.start.x) {
+                    nextLine.end = prevLine.end;
+                }
+                else {
+                    nextLine.start = prevLine.start;
+                }
+                horizontalLines.splice(i, 1);
             }
         }
 
         // Sort and merge vertical lines
         verticalLines.sort((line1, line2) => line1.start.x - line2.start.x);
-        const mergedVerticalLines = [verticalLines[0]];
-        for (let i = 1; i < verticalLines.length; i++) {
-            const currentLine = verticalLines[i];
-            const previousLine = mergedVerticalLines[mergedVerticalLines.length - 1];
+        for (let i = 0; i < verticalLines.length - 1; i++) {
+            const prevLine = verticalLines[i];
+            const nextLine = verticalLines[i + 1];
 
-            if (currentLine.start.x === previousLine.end.x) {
+            if (nextLine.start.x === prevLine.end.x &&
+            (
+                nextLine.start.y === prevLine.end.y || nextLine.end.y === prevLine.start.y ||
+                nextLine.start.y === prevLine.start.y || nextLine.end.y === prevLine.end.y
+            )) {
                 // Lines are adjacent, merge them
-                previousLine.end = currentLine.end;
-            } else {
-                // Lines are not adjacent, add the current line to mergedVerticalLines
-                mergedVerticalLines.push(currentLine);
+                if(nextLine.end.y === prevLine.end.y) {
+                    nextLine.end = prevLine.start;
+                }
+                else if(nextLine.start.y === prevLine.start.y) {
+                    nextLine.start = prevLine.end;
+                }
+                else if(nextLine.end.y === prevLine.start.y) {
+                    nextLine.end = prevLine.end;
+                }
+                else {
+                    nextLine.start = prevLine.start;
+                }
+                verticalLines.splice(i, 1);
             }
         }
         this.lines = [...verticalLines, ...horizontalLines];
