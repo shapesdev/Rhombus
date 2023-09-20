@@ -1,23 +1,19 @@
 import { DrawSystem } from "./drawSystem.js";
 import { Player } from "./player.js";
+import { GameStateManager } from "./gameStateManager.js";
+import { Grid } from "./grid.js";
 
 export class gameManager {
     constructor() {
-        this.drawSystem = new DrawSystem();
-        this.playerOne = new Player('John');
-        this.playerTwo = new Player('Tom');
+
     }
 
     init() {
-        this.drawSystem.init(700, 700, 7, 100);
-        this.initPlayers();
-    }
-
-    initPlayers() {
-        const playerNameElement1 = document.getElementById("player-name1");
-        const playerNameElement2 = document.getElementById("player-name2");
-        playerNameElement1.textContent = this.playerOne.playerName;
-        playerNameElement2.textContent = this.playerTwo.playerName;
+        this.player1 = new Player('John', 'black', 'red');
+        this.player2 = new Player('Tom', 'black', 'blue');
+        this.grid = new Grid(7, 100);
+        this.gameStateManager = new GameStateManager([this.player1, this.player2], this.grid);
+        this.drawSystem = new DrawSystem(this.grid, this.gameStateManager);
     }
 
     onMouseMove(e) {
@@ -25,7 +21,10 @@ export class gameManager {
     }
     
     onMouseRelease() {
-        this.drawSystem.complete();
+        if(this.drawSystem.completeDraw()) {
+            this.gameStateManager.handleTileConquer();
+        }
+        this.drawSystem.reset();
     }
     
     onMousePress(e) {

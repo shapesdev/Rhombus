@@ -1,10 +1,11 @@
 import { Canvas } from "./canvas.js";
-import { Grid } from "./grid.js";
 
 export class DrawSystem {
-    constructor() {
-        this.canvas = null;
-        this.grid = null;
+    constructor(grid, gameStateManager) {
+        this.grid = grid;
+        this.gameStateManager = gameStateManager;
+        this.canvas = new Canvas(this.grid.size * this.grid.tileSize,
+            this.grid.size * this.grid.tileSize);
         this.maxLineLength = 300;
         this.linePos = { x: 0, y: 0 };
         this.startPoint = { x: 0, y: 0 };
@@ -13,11 +14,7 @@ export class DrawSystem {
         this.drawing = false;
         this.direction = '';
         this.lineColor = 'black';
-    }
 
-    init(canvasWidth, canvasHeight, gridSize, tileSize) {
-        this.grid = new Grid(gridSize, tileSize);
-        this.canvas = new Canvas(canvasWidth, canvasHeight);
         this.drawGrid();
     }
     
@@ -37,12 +34,13 @@ export class DrawSystem {
         for(let i = 0; i < grid.size; i++) {
             for(let j = 0; j < grid.size; j++) {
                 grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
-                if(grid.tiles[i][j].isFilled) {
-                    canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(128, 231, 143, 0.9)');
+                if(grid.tiles[i][j].tileType != null) {
+                    canvas.colorPath2D(grid.tiles[i][j].path, grid.tiles[i][j].tileType);
                 }
                 else if(grid.totalLegalMoves == 0) {
                     canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
                 }
+                //console.log(grid.totalLegalMoves);
             }
         }
     }
@@ -148,9 +146,8 @@ export class DrawSystem {
         }
     }
 
-    complete() {
-        this.validateLine();
-        this.reset();
+    completeDraw() {
+        return this.isDrawSuccessful();
     }
 
     updateLineColor() {
@@ -173,8 +170,9 @@ export class DrawSystem {
         }
     }
 
-    validateLine() {
+    isDrawSuccessful() {
         const {direction, startPoint, maxLineLength } = this;
+        let success = false;
 
         const line = {
             start: {...startPoint},
@@ -198,21 +196,20 @@ export class DrawSystem {
                 line.end.x = line.start.x + maxLineLength * dir.x;
                 line.end.y = line.start.y + maxLineLength * dir.y;
                 this.grid.update(line, dir);
+                success = true;
             }
             else {
                 console.warn('Line is not valid');
             }
-            this.clear();
         }
-    }
-
-    clear() {
-        this.canvas.clear();
-        this.drawPreviousLines();
-        this.drawGrid();
+        return success;
     }
 
     reset() {
+        this.canvas.clear();
+        this.drawPreviousLines();
+        this.drawGrid();
+
         this.direction = '';
         this.drawing = false;
         this.linePos = {x: 0, y: 0};

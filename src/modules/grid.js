@@ -9,7 +9,7 @@ class Tile {
         this.nextOnPath = null;
         this.neighbors = [];
         this.isChecked = false;
-        this.isFilled = false;
+        this.tileType = null;
     }
 }
 
@@ -40,6 +40,7 @@ export class Grid {
         this.tiles = [];
         this.edges = [];
         this.lines = [];
+        this.conqueredTiles = [];
         this.totalLegalMoves = 0;
         this.directionMap = {
             N: {x: 0, y: -1},
@@ -230,9 +231,7 @@ export class Grid {
                 let arr1 = this.getTileNeighbors(tiles[i]);
                 let arr2 = this.getTileNeighbors(tiles[i+1]);
                 if(arr1.length != 0 && arr2.length != 0) {
-                    let arr = arr1.length < arr2.length ? arr1 : arr2;
-                    this.updateTilePaths(arr);
-                    console.log(`Points the player should get: ${arr.length}`);
+                    this.conqueredTiles = arr1.length < arr2.length ? arr1 : arr2;
                 }
             }
         }
@@ -249,14 +248,13 @@ export class Grid {
         }
         if(leftArr.length != 0 && rightArr.length != 0) {
             let arr = leftArr.length < rightArr.length ? leftArr : rightArr;
-            this.updateTilePaths(arr);
+            this.setTilePaths(arr);
         }
     }
 
-        
-    updateTilePaths(tiles) {
-        for(const tile of tiles) {
-            tile.isFilled = true;
+    setTilePaths(tileType) {
+        for(const tile of this.conqueredTiles) {
+            tile.tileType = tileType;
         }
 
         for (let x = 0; x < this.size; x++) {
@@ -264,6 +262,8 @@ export class Grid {
                 this.tiles[x][y].isChecked = false;
             }
         }
+
+        this.conqueredTiles = [];
     }
 
     updateVertices() {
@@ -378,7 +378,7 @@ export class Grid {
             let x = vert.x / this.tileSize;
             let y = vert.y / this.tileSize;
             if(x < this.size && y < this.size) {
-                if(this.tiles[x][y].isFilled) {
+                if(this.tiles[x][y].tileType != null) {
                     return true;
                 }
             }
