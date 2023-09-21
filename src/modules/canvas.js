@@ -1,79 +1,52 @@
-export class Canvas {
-    constructor(width, height) {
-        this.canvas = null;
-        this.ctx = null;
-        this.width = width;
-        this.height = height;
-        this.init();
-    }
+export function createCanvas(width, height) {
+    const canvasElem = document.createElement('canvas');
+    canvasElem.id = 'canvas';
+    document.body.appendChild(canvasElem);
 
-    init() {
-        this.createCanvas();
-        this.resize();
-    }
+    const ctx = canvasElem.getContext('2d');
 
-    resize() {
-        this.ctx.canvas.width = this.width;
-        this.ctx.canvas.height = this.height;
-    }
+    canvasElem.width = width;
+    canvasElem.height = height;
 
-    getBoundingClientRect() {
-        return this.canvas.getBoundingClientRect();
-    }
+    return {canvasElem, ctx};
+}
 
-    createCanvas() {
-        this.canvas = document.createElement('canvas');
-        this.canvas.id = 'canvas';
-        document.body.appendChild(this.canvas);
-        this.ctx = this.canvas.getContext('2d');
-    }
+export function drawPath2D(ctx, x, y, w, h, strokeStyle = '#000000', lineWidth = 0.2) {
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = strokeStyle;
+    const path = new Path2D();
+    path.rect(x, y, w, h);
+    path.closePath();
+    ctx.stroke(path);
+    return path;
+}
 
-    drawPath2D(x, y, w, h, strokeStyle = '#000000', lineWidth = 0.2) {
-        this.ctx.lineWidth = lineWidth;
-        this.ctx.strokeStyle = strokeStyle;
-        const path = new Path2D();
-        path.rect(x, y, w, h);
-        path.closePath();
-        this.ctx.stroke(path);
-        return path;
-    }
+export function colorPath2D(ctx, path, fillStyle = 'green') {
+    ctx.fillStyle = fillStyle;
+    ctx.fill(path);
+}
 
-    colorPath2D(path, fillStyle = 'green') {
-        this.ctx.fillStyle = fillStyle;
-        this.ctx.fill(path);
-    }
+export function drawLine(ctx, start, end, lineWidth = 5, strokeStyle = 'black', lineCap = 'round') {
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineCap = lineCap;
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+}
 
-    drawLine(start, end, lineWidth = 5, strokeStyle = 'black', lineCap = 'round') {
-        const {ctx} = this;
+export function drawPoint(ctx, x, y, pointRadius, fillColor = 'black') {
+    ctx.beginPath();
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = 'black';
+    ctx.arc(x, y, pointRadius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+}
 
-        ctx.beginPath();
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineCap = lineCap;
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-    }
-
-    drawPoint(x, y, pointRadius, fillColor = 'black') {
-        const {ctx} = this;
-
-        ctx.beginPath();
-        ctx.fillStyle = fillColor;
-        ctx.strokeStyle = 'black';
-        ctx.arc(x, y, pointRadius, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.stroke();
-    }
-
-    drawText(x, y, text, fillColor = 'black', font = 'bold 20px san-serif') {
-        const {ctx} = this;
-        ctx.fillStyle = fillColor;
-        ctx.font = font;
-        ctx.fillText(text, x, y);
-    }
-
-    clear(x = 0, y = 0, width = this.width, height = this.height) {
-        this.ctx.clearRect(x, y, width, height);
-    }
+export function drawText(ctx, x, y, text, fillColor = 'black', font = 'bold 20px san-serif') {
+    ctx.fillStyle = fillColor;
+    ctx.font = font;
+    ctx.fillText(text, x, y);
 }

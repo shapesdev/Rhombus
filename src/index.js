@@ -1,4 +1,4 @@
-import { gameManager } from "./modules/gameManager.js";
+import { gameManager } from "./classes/gameManager.js";
 
 const game = new gameManager();
 

@@ -1,11 +1,12 @@
-import { Canvas } from "./canvas.js";
+import * as canvas from '../modules/canvas.js';
+import { lines } from '../modules/lineHandler.js';
+
+const { canvasElem, ctx } = canvas.createCanvas(700, 700);
 
 export class DrawSystem {
     constructor(grid, gameStateManager) {
         this.grid = grid;
         this.gameStateManager = gameStateManager;
-        this.canvas = new Canvas(this.grid.size * this.grid.tileSize,
-            this.grid.size * this.grid.tileSize);
         this.maxLineLength = 300;
         this.linePos = { x: 0, y: 0 };
         this.startPoint = { x: 0, y: 0 };
@@ -14,7 +15,6 @@ export class DrawSystem {
         this.drawing = false;
         this.direction = '';
         this.lineColor = 'black';
-
         this.drawGrid();
     }
     
@@ -25,20 +25,20 @@ export class DrawSystem {
         this.setPosition(e);
         this.limitLineLength();
         this.updateLineColor();
-        this.canvas.drawLine(this.startPoint, this.linePos, 5, this.lineColor);
+        canvas.drawLine(ctx, this.startPoint, this.linePos, 5, this.lineColor);
     }
 
     drawGrid() {
-        const {grid, canvas} = this;
+        const {grid} = this;
 
         for(let i = 0; i < grid.size; i++) {
             for(let j = 0; j < grid.size; j++) {
-                grid.tiles[i][j].path = canvas.drawPath2D(i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
+                grid.tiles[i][j].path = canvas.drawPath2D(ctx, i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
                 if(grid.tiles[i][j].tileType != null) {
-                    canvas.colorPath2D(grid.tiles[i][j].path, grid.tiles[i][j].tileType);
+                    canvas.colorPath2D(ctx, grid.tiles[i][j].path, grid.tiles[i][j].tileType);
                 }
                 else if(grid.totalLegalMoves == 0) {
-                    canvas.colorPath2D(grid.tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
+                    canvas.colorPath2D(ctx, grid.tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
                 }
                 //console.log(grid.totalLegalMoves);
             }
@@ -46,18 +46,18 @@ export class DrawSystem {
     }
 
     drawPath2D(e) {
-        const {grid, canvas} = this;
+        const {grid} = this;
 
-        const x = Math.floor((e.x - canvas.getBoundingClientRect().left) / grid.tileSize);
-        const y = Math.floor((e.y - canvas.getBoundingClientRect().top) / grid.tileSize);
+        const x = Math.floor((e.x - canvasElem.getBoundingClientRect().left) / grid.tileSize);
+        const y = Math.floor((e.y - canvasElem.getBoundingClientRect().top) / grid.tileSize);
         const tile = grid.getTile(x, y);
         canvas.drawPoint(tile.x * grid.tileSize + 50, tile.y * grid.tileSize + 50, 8);
     }
 
     drawPreviousLines() {
-        if(this.grid.lines.length > 0) {
-            this.grid.lines.forEach((line) => {
-                this.canvas.drawLine(line.start, line.end);
+        if(lines.length > 0) {
+            lines.forEach((line) => {
+                canvas.drawLine(ctx, line.start, line.end);
             })
         }
     }
@@ -87,8 +87,8 @@ export class DrawSystem {
     
     setStartPoint(e) {
         if(!this.drawing) {
-            const x = e.x - canvas.getBoundingClientRect().left;
-            const y = e.y - canvas.getBoundingClientRect().top;
+            const x = e.x - canvasElem.getBoundingClientRect().left;
+            const y = e.y - canvasElem.getBoundingClientRect().top;
             let minDistance = 1000000;
             let closestPoint;
     
@@ -107,13 +107,13 @@ export class DrawSystem {
     }
 
     setPosition(e) {
-        const { direction, startPoint, canvas } = this;
+        const { direction, startPoint } = this;
 
-        const x = e.x - canvas.getBoundingClientRect().left;
-        const y = e.y - canvas.getBoundingClientRect().top;
+        const x = e.x - canvasElem.getBoundingClientRect().left;
+        const y = e.y - canvasElem.getBoundingClientRect().top;
     
         if(['E', 'W'].includes(direction)) {
-            if(this.linePos.y != canvas.height && this.linePos.y != 0 
+            if(this.linePos.y != canvasElem.height && this.linePos.y != 0 
             && ((direction === 'E' && x >= this.linePos.x) 
             || (direction === 'W' && x <= this.linePos.x))) {
 
@@ -121,7 +121,7 @@ export class DrawSystem {
             }
         }
         else if(['S', 'N'].includes(direction)) {
-            if(this.linePos.x != canvas.width && this.linePos.x != 0
+            if(this.linePos.x != canvasElem.width && this.linePos.x != 0
             && ((direction === 'S' && y >= this.linePos.y) 
             || (direction === 'N' && y <= this.linePos.y))) {
 
@@ -144,10 +144,6 @@ export class DrawSystem {
         } else if (startPoint.y - this.linePos.y > maxLineLength) {
             this.linePos.y = startPoint.y - maxLineLength;
         }
-    }
-
-    completeDraw() {
-        return this.isDrawSuccessful();
     }
 
     updateLineColor() {
@@ -190,7 +186,7 @@ export class DrawSystem {
                 length = Math.abs(line.end.y - line.start.y) / maxLineLength;
             }
 
-            if(length > 0.85 && line.end.x <= this.canvas.width && line.end.y <= this.canvas.height
+            if(length > 0.85 && line.end.x <= canvasElem.width && line.end.y <= canvasElem.height
             && line.end.x >= 0 && line.end.y >= 0 && this.grid.isLineValid(line.start.x, line.end.x, line.start.y, line.end.y, dir)) {          
          
                 line.end.x = line.start.x + maxLineLength * dir.x;
@@ -206,7 +202,7 @@ export class DrawSystem {
     }
 
     reset() {
-        this.canvas.clear();
+        ctx.clearRect(0, 0, canvasElem.width, canvasElem.height);
         this.drawPreviousLines();
         this.drawGrid();
 

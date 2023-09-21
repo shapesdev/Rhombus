@@ -21,7 +21,7 @@ export class gameManager {
     }
     
     onMouseRelease() {
-        if(this.drawSystem.completeDraw()) {
+        if(this.drawSystem.isDrawSuccessful()) {
             this.gameStateManager.handleTileConquer();
         }
         this.drawSystem.reset();
