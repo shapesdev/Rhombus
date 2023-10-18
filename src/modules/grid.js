@@ -20,7 +20,7 @@ const directionMap = {
     W: {x: -1, y: 0},
 };
 
-export function generate() {
+export function generateGrid() {
     for (let x = 0; x <= size; x++) {
         if(x < size) {
             tiles[x] = [];
@@ -45,7 +45,7 @@ export function generate() {
     updateLegalMoves();
 }
 
-export function update(line, dir) {
+export function updateGrid(line, dir) {
     updateTiles(line, dir);
     updateLines(line);
 }
@@ -107,6 +107,7 @@ function getTileNeighbors(tile) {
             }
         }
     }
+    resetCheckValues();
     return arr;
 }
 
@@ -139,21 +140,25 @@ function updateTiles(line, dir) {
         tempTiles.push(edge.tile1);
         tempTiles.push(edge.tile2);
     }
-    updateConqueredTilesCombined(tempTiles);
-    //updateConqueredTiles(tempTiles);
+    updateConqueredTiles(tempTiles);
 }
 
-function updateConqueredTiles(tiles) {
+function updateConqueredTiles(tiles) {;
+    let set = new Set();
     for(let i = 0; i < tiles.length; i+=2) {
         if(!isPathPossible(tiles[i], tiles[i + 1])) {
-            let arr1 = getTileNeighbors(tiles[i]);
-            let arr2 = getTileNeighbors(tiles[i+1]);
-            if(arr1.length != 0 && arr2.length != 0) {
-                conqueredTiles = arr1.length < arr2.length ? arr1 : arr2;
-            }
+            const arr1 = getTileNeighbors(tiles[i]);
+            const arr2 = getTileNeighbors(tiles[i + 1]);
+
+            const arr = arr1.length < arr2.length ? arr1 : arr2;
+            arr.forEach(item => set.add(item));
         }
     }
+    if(set.size > 0) {
+        conqueredTiles = [...set];
+    }
 }
+
 function setLegalMoveCount(vert) {
     let count = 0;
     for(const direction in directionMap) {
@@ -186,17 +191,10 @@ function isTileClaimed(vert) {
     return false;
 }
 
-function updateConqueredTilesCombined(tiles) {
-    let leftArr = [];
-    let rightArr = [];
-    for(let i = 0; i < tiles.length; i+=2) {
-        if(!isPathPossible(tiles[i], tiles[i + 1])) {
-            leftArr = leftArr.concat(getTileNeighbors(tiles[i]));
-            rightArr = rightArr.concat(getTileNeighbors(tiles[i + 1]));
+function resetCheckValues() {
+    for(let i = 0; i < size; i++) {
+        for(let j = 0; j < size; j++) {
+            tiles[i][j].isChecked = false;
         }
-    }
-    if(leftArr.length != 0 && rightArr.length != 0) {
-        let arr = leftArr.length < rightArr.length ? leftArr : rightArr;
-        conqueredTiles = arr;
     }
 }

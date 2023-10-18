@@ -1,6 +1,6 @@
 import { lines } from './lineHandler.js';
 import * as canvas from './canvas.js';
-import { size, tiles, tileSize, totalLegalMoves, directionMap, vertices, isLineValid, update } from './grid.js';
+import { size, tiles, tileSize, totalLegalMoves, directionMap, vertices, isLineValid, updateGrid } from './grid.js';
 
 const { canvasElem, ctx } = canvas.create(700, 700);
 
@@ -83,7 +83,7 @@ export function isDrawSuccessful() {
      
             line.end.x = line.start.x + maxLineLength * dir.x;
             line.end.y = line.start.y + maxLineLength * dir.y;
-            update(line, dir);
+            updateGrid(line, dir);
             success = true;
         }
         else {

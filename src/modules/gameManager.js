@@ -1,5 +1,5 @@
 import { draw, isDrawSuccessful, reset, drawGrid, setPosition } from "./drawSystem.js";
-import { generate, updateLegalMoves } from "./grid.js";
+import { generateGrid, updateLegalMoves } from "./grid.js";
 import { players, handleTileConquer } from "./gameStateManager.js";
 
 import { Player } from "../classes/player.js";
@@ -13,7 +13,7 @@ export function init() {
     players.push(player1);
     players.push(player2);
 
-    generate();
+    generateGrid();
     drawGrid();
 }
 
