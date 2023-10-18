@@ -13,7 +13,7 @@ let tiles = [];
 let edges = [];
 let conqueredTiles = [];
 let totalLegalMoves = 0;
-let directionMap = {
+const directionMap = {
     N: {x: 0, y: -1},
     E: {x: 1, y: 0},
     S: {x: 0, y: 1},
