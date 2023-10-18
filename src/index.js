@@ -1,6 +1,4 @@
-import { gameManager } from "./classes/gameManager.js";
-
-const game = new gameManager();
+import * as game from '../src/modules/gameManager.js';
 
 // Events
 document.addEventListener('mousemove', function(e){game.onMouseMove(e)});
