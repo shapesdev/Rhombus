@@ -1,15 +1,16 @@
+import { setTilePaths, conqueredTiles } from "../modules/grid.js";
+
 export class GameStateManager {
-    constructor(players, grid) {   
+    constructor(players) {   
       this.currentPlayer = null;
       this.players = players;
-      this.grid = grid;
       this.updatePlayerTurns();
     }
   
     handleTileConquer() {
-        if(this.grid.conqueredTiles.length > 0) {
-            this.currentPlayer.points += this.grid.conqueredTiles.length;
-            this.grid.setTilePaths(this.currentPlayer.claimType);
+        if(conqueredTiles.length > 0) {
+            this.currentPlayer.points += conqueredTiles.length;
+            setTilePaths(this.currentPlayer.claimType);
         }
         this.updatePlayerTurns();
     }

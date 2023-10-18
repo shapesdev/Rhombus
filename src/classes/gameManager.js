@@ -1,33 +1,33 @@
-import { DrawSystem } from "./drawSystem.js";
+import { draw, isDrawSuccessful, reset, drawGrid, setPosition } from "../modules/drawSystem.js";
+import { generate, updateLegalMoves } from "../modules/grid.js";
 import { Player } from "./player.js";
 import { GameStateManager } from "./gameStateManager.js";
-import { Grid } from "./grid.js";
 
 export class gameManager {
     constructor() {
-
+        this.player1 = new Player('John', 'black', 'red');
+        this.player2 = new Player('Tom', 'black', 'blue');
+        this.gameStateManager = new GameStateManager([this.player1, this.player2]);
     }
 
     init() {
-        this.player1 = new Player('John', 'black', 'red');
-        this.player2 = new Player('Tom', 'black', 'blue');
-        this.grid = new Grid(7, 100);
-        this.gameStateManager = new GameStateManager([this.player1, this.player2], this.grid);
-        this.drawSystem = new DrawSystem(this.grid, this.gameStateManager);
+        generate();
+        drawGrid();
     }
 
     onMouseMove(e) {
-        this.drawSystem.draw(e);
+        draw(e);
     }
     
     onMouseRelease() {
-        if(this.drawSystem.isDrawSuccessful()) {
+        if(isDrawSuccessful()) {
             this.gameStateManager.handleTileConquer();
+            updateLegalMoves();
         }
-        this.drawSystem.reset();
+        reset();
     }
     
     onMousePress(e) {
-        this.drawSystem.setPosition(e);
+        setPosition(e);
     }
 }

@@ -1,4 +1,4 @@
-export function createCanvas(width, height) {
+export function create(width, height) {
     const canvasElem = document.createElement('canvas');
     canvasElem.id = 'canvas';
     document.body.appendChild(canvasElem);
@@ -26,7 +26,7 @@ export function colorPath2D(ctx, path, fillStyle = 'green') {
     ctx.fill(path);
 }
 
-export function drawLine(ctx, start, end, lineWidth = 5, strokeStyle = 'black', lineCap = 'round') {
+export function drawLine(ctx, start, end, lineWidth = 3, strokeStyle = 'black', lineCap = 'round') {
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = strokeStyle;
