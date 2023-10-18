@@ -139,7 +139,8 @@ function updateTiles(line, dir) {
         tempTiles.push(edge.tile1);
         tempTiles.push(edge.tile2);
     }
-    updateConqueredTiles(tempTiles);
+    updateConqueredTilesCombined(tempTiles);
+    //updateConqueredTiles(tempTiles);
 }
 
 function updateConqueredTiles(tiles) {
@@ -185,18 +186,17 @@ function isTileClaimed(vert) {
     return false;
 }
 
-    // Likely won't be used // Leaving just in case
-/*     updateTilesCombined(tiles) {
-        let leftArr = [];
-        let rightArr = [];
-        for(let i = 0; i < tiles.length; i+=2) {
-            if(!isPathPossible(tiles[i], tiles[i + 1])) {
-                leftArr = leftArr.concat(getTileNeighbors(tiles[i]));
-                rightArr = rightArr.concat(getTileNeighbors(tiles[i + 1]));
-            }
+function updateConqueredTilesCombined(tiles) {
+    let leftArr = [];
+    let rightArr = [];
+    for(let i = 0; i < tiles.length; i+=2) {
+        if(!isPathPossible(tiles[i], tiles[i + 1])) {
+            leftArr = leftArr.concat(getTileNeighbors(tiles[i]));
+            rightArr = rightArr.concat(getTileNeighbors(tiles[i + 1]));
         }
-        if(leftArr.length != 0 && rightArr.length != 0) {
-            let arr = leftArr.length < rightArr.length ? leftArr : rightArr;
-            setTilePaths(arr);
-        }
-    } */
+    }
+    if(leftArr.length != 0 && rightArr.length != 0) {
+        let arr = leftArr.length < rightArr.length ? leftArr : rightArr;
+        conqueredTiles = arr;
+    }
+}
