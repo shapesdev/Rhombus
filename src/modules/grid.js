@@ -72,6 +72,10 @@ export function updateLegalMoves() {
     //console.log(totalLegalMoves);
 }
 
+export function updateConqueredTilesCollection(arr) {
+    conqueredTiles = arr;
+}
+
 export function isLineValid(x1, x2, y1, y2, dir) {
     const mid = getVertex(x1 + tileSize * 2 * dir.x, y1 + tileSize * 2 * dir.y);
     return !isIntersecting(x1, x2, y1, y2) && !isTileClaimed(mid);

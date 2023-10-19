@@ -5,6 +5,8 @@ export class Player {
         this.claimType = claimType;
         this.points = 0;
 
+        this.pointsElem = null;
+
         //Statistics overall
         this.totalGamesPlayed = 0;
         this.totalWins = 0;
@@ -13,5 +15,10 @@ export class Player {
         this.totalLinesDrawn = 0;
         this.totalPointsReceived = 0;
         this.highestPointsReceived = 0;
+    }
+
+    updatePoints(points) {
+        this.points += points;
+        this.pointsElem.innerText = this.points;
     }
 }

@@ -18,20 +18,12 @@
     /* Add any other styles you want */
 }
 
-.player-container {
-    display: flex;
-}
-
-.left-player {
-    margin-left: 0px;
-    margin-bottom: 20px;
+.left {
     font-size: 25px; /* Adjust the font size */
     color: #000; /* Set the text color to black */
 }
 
-.right-player {
-    margin-left: 525px;
-    margin-bottom: 20px;
+.right {
     font-size: 25px; /* Adjust the font size */
     color: #000; /* Set the text color to black */
 }

@@ -52,9 +52,9 @@ export function drawGrid() {
             if(tiles[i][j].tileType != null) {
                 canvas.colorPath2D(ctx, tiles[i][j].path, tiles[i][j].tileType);
             }
-            else if(totalLegalMoves == 0) {
+/*             else if(totalLegalMoves == 0) {
                 canvas.colorPath2D(ctx, tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
-            }
+            } */
         }
     }
 }
