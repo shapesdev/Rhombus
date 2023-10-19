@@ -2,13 +2,13 @@ import { setTilePaths, conqueredTiles, totalLegalMoves, updateLegalMoves, tiles,
 
 export {players};
 
-let currentPlayer = null;
+let current = null;
 let players = [];
 
 export function handleTileConquer() {
     if(conqueredTiles.length > 0) {
-        currentPlayer.updatePoints(conqueredTiles.length);
-        setTilePaths(currentPlayer.claimType);
+        current.updatePoints(conqueredTiles.length);
+        setTilePaths(current.claimType);
     }
     updateLegalMoves();
 
@@ -21,7 +21,7 @@ export function handleTileConquer() {
 }
 
 function gameOver() {
-    let tempArray = [];
+    const tempArray = [];
     tiles.forEach((tiles2 => {
         tiles2.forEach((tile => {
             if(tile.tileType == null) {
@@ -29,22 +29,22 @@ function gameOver() {
             }
         }))
     }))
-    let player = currentPlayer == players[0] ? players[1] : players[0];
-    player.updatePoints(tempArray.length);
+    let other = current == players[0] ? players[1] : players[0];
+    other.updatePoints(tempArray.length);
 
     updateConqueredTilesCollection(tempArray);
-    setTilePaths(player.claimType);
+    setTilePaths(other.claimType);
 
-    const winner = player.points > currentPlayer.points ? player : currentPlayer;
+    const winner = other.points > current.points ? other : current;
     console.log(`${winner.playerName} Won!`);
 }
 
 function updatePlayerTurns() {
-    if(currentPlayer == null) {
-        currentPlayer = players[0];
+    if(current == null) {
+        current = players[0];
     }
     else {
-        currentPlayer = currentPlayer == players[0] ? players[1] : players[0];
+        current = current == players[0] ? players[1] : players[0];
     }
     //console.log(`It's ${currentPlayer.playerName} Turn!`);
 }
