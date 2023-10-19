@@ -95,7 +95,6 @@ function getTileNeighbors(tile) {
 
     while(queue.length > 0) {
         const tile = queue.shift();
-
         if(!tile.isChecked) {
             tile.isChecked = true;
             arr.push(tile);
@@ -132,7 +131,6 @@ function updateTiles(line, dir) {
         if(dir.x == -1) {
             newX--;
         }
-
         const edge = getEdge(newX, newY, edgeType);
 
         edge.tile1.neighbors.splice(edge.tile1.neighbors.indexOf(edge.tile2), 1);
@@ -144,32 +142,50 @@ function updateTiles(line, dir) {
 }
 
 function updateConqueredTiles(tiles) {;
-    let set = new Set();
+    const set = new Set();
     for(let i = 0; i < tiles.length; i+=2) {
         if(!isPathPossible(tiles[i], tiles[i + 1])) {
             const arr1 = getTileNeighbors(tiles[i]);
             const arr2 = getTileNeighbors(tiles[i + 1]);
-
-            const arr = arr1.length < arr2.length ? arr1 : arr2;
-            arr.forEach(item => set.add(item));
+            if(totalLegalMoves > 1) {
+                const arr = arr1.length < arr2.length ? arr1 : arr2;
+                arr.forEach(item => set.add(item));
+            }
+            else {
+                set.add(arr1);
+                set.add(arr2);
+            }
         }
     }
-    if(set.size > 0) {
-        conqueredTiles = [...set];
+    
+    if(totalLegalMoves > 1) {
+        if(set.size > 0) {
+            conqueredTiles = [...set];
+        }
+    }
+    else {
+        let temp = [];
+        let shortestLength = Infinity;
+        set.forEach((arr) => {
+            if(arr.length < shortestLength) {
+                shortestLength = arr.length;
+                temp = arr;
+            }
+        });
+        conqueredTiles = temp;
     }
 }
 
 function setLegalMoveCount(vert) {
     let count = 0;
+
     for(const direction in directionMap) {
         const {x, y} = directionMap[direction];
-
         if((x === 0 && (vert.x === 0 || vert.x === size * tileSize)) ||
            (y === 0 && (vert.y === 0 || vert.y === size * tileSize))) {
             continue;
-        }
+        } 
         const end = getVertex(vert.x + (3 * tileSize * x), vert.y + (3 * tileSize * y));
-
         if(end && isLineValid(vert.x, end.x, vert.y, end.y, {x, y})) {
             count++;
         }
@@ -180,8 +196,8 @@ function setLegalMoveCount(vert) {
 
 function isTileClaimed(vert) {
     if(vert) {
-        let x = vert.x / tileSize;
-        let y = vert.y / tileSize;
+        const x = vert.x / tileSize;
+        const y = vert.y / tileSize;
         if(x < size && y < size) {
             if(tiles[x][y].tileType != null) {
                 return true;
