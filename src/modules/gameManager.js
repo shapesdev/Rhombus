@@ -1,6 +1,6 @@
 import { draw, isDrawSuccessful, reset, drawGrid, setPosition } from "./drawSystem.js";
 import { generateGrid } from "./grid.js";
-import { players, handleTileConquer } from "./gameStateManager.js";
+import { players, handleTileConquer, initStartingPlayer } from "./gameStateManager.js";
 
 import { Player } from "../classes/player.js";
 
@@ -33,6 +33,8 @@ function initPlayers() {
     player2 = new Player('Tom', 'black', 'blue');
     players.push(player1);
     players.push(player2);
+
+    initStartingPlayer(player1);
 
     player1.pointsElem = document.getElementById('player-points-1');
     player2.pointsElem = document.getElementById('player-points-2');

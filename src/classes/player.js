@@ -11,7 +11,6 @@ export class Player {
         this.totalGamesPlayed = 0;
         this.totalWins = 0;
         this.totalLoses = 0;
-        this.totalDraws = 0;
         this.totalLinesDrawn = 0;
         this.totalPointsReceived = 0;
         this.highestPointsReceived = 0;
@@ -19,6 +18,10 @@ export class Player {
 
     updatePoints(points) {
         this.points += points;
+        this.totalPointsReceived += points;
+        if(this.highestPointsReceived < points) {
+            this.highestPointsReceived = points;
+        }
         this.pointsElem.innerText = this.points;
     }
 }
