@@ -34,7 +34,7 @@ function gameOver() {
 
 function displayWinnerStatistics() {
     console.log(`${players[0].playerName} Won!`)
-    console.log(players[0]);
+    //console.log(players[0]);
 }
 
 function updateStatistics() {
@@ -52,7 +52,7 @@ function gameOverPointsUpdate() {
     const tempArray = [];
     tiles.forEach((tiles2 => {
         tiles2.forEach((tile => {
-            if(tile.tileType == null) {
+            if(tile && tile.tileType == null) {
                 tempArray.push(tile);
             }
         }))

@@ -1,5 +1,5 @@
 import { draw, isDrawSuccessful, reset, drawGrid, setPosition } from "./drawSystem.js";
-import { generateGrid } from "./grid.js";
+import { generateRhombusGrid, generateSquareGrid } from "./grid.js";
 import { players, handleTileConquer, initStartingPlayer } from "./gameStateManager.js";
 
 import { Player } from "../classes/player.js";
@@ -9,7 +9,8 @@ let player2 = null;
 
 export function init() {
     initPlayers();
-    generateGrid();
+    generateRhombusGrid();
+    //generateSquareGrid();
     drawGrid();
 }
 

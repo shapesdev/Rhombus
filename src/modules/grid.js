@@ -20,13 +20,11 @@ const directionMap = {
     W: {x: -1, y: 0},
 };
 
-export function generateGrid() {
+export function generateSquareGrid() {
+    initGrid();
     for (let x = 0; x <= size; x++) {
-        if(x < size) {
-            tiles[x] = [];
-        }
         for (let y = 0; y <= size; y++) {
-            if(x < size && y < size) {
+            if(x < size && y < size) {;
                 tiles[x][y] = new Tile(x, y);
                 if(y > 0) {
                     makeNeighbors(tiles[x][y], tiles[x][y - 1]);
@@ -45,6 +43,43 @@ export function generateGrid() {
     updateLegalMoves();
 }
 
+export function generateRhombusGrid() {
+    initGrid();
+    let mid = Math.floor(size / 2);
+    let startIndex = mid;
+    let tileCount = 1;
+    for (let y = 0; y < size; y++) {
+        for(let i = 0, x = startIndex; i < tileCount; i++, x++) {
+            tiles[x][y] = new Tile(x, y);
+            if(i > 0 && tileCount != 1) {
+                makeNeighbors(tiles[x][y], tiles[x - 1][y]);
+                edges.push(new Edge(x, y, 'W', tiles[x][y], tiles[x - 1][y]));
+            }
+            if(y > 0 && (i > 0 || (i == 0 && y > mid))) {
+                if(tiles[x][y - 1]) {
+                    makeNeighbors(tiles[x][y], tiles[x][y - 1]);
+                    edges.push(new Edge(x, y, 'N', tiles[x][y], tiles[x][y - 1]));
+                }
+            }
+
+             if(y > 0 && x > 0 && (i != 0 && y != 0)) {
+                vertices.push(new Vertex(x * tileSize, y * tileSize));
+                vertices.push(new Vertex(x * tileSize, (y + 1) * tileSize));
+            }
+        }
+        if(y <= startIndex + 1) {
+            tileCount += 2;
+            startIndex--;
+        }
+        else {
+            tileCount -= 2;
+            startIndex++;
+        }
+    }
+    console.log(edges.length);
+    updateLegalMoves();
+}
+
 export function updateGrid(line, dir) {
     updateTiles(line, dir);
     updateLines(line);
@@ -52,12 +87,16 @@ export function updateGrid(line, dir) {
 
 export function setTilePaths(tileType) {
     for(const tile of conqueredTiles) {
-        tile.tileType = tileType;
+        if(tile != null) {
+            tile.tileType = tileType;
+        }
     }
 
     for (let x = 0; x < size; x++) {
         for (let y = 0; y < size; y++) {
-            tiles[x][y].isChecked = false;
+            if(tiles[x][y]) {
+                tiles[x][y].isChecked = false;
+            }
         }
     }
     conqueredTiles = [];
@@ -79,6 +118,15 @@ export function updateConqueredTilesCollection(arr) {
 export function isLineValid(x1, x2, y1, y2, dir) {
     const mid = getVertex(x1 + tileSize * 2 * dir.x, y1 + tileSize * 2 * dir.y);
     return !isIntersecting(x1, x2, y1, y2) && !isTileClaimed(mid);
+}
+
+function initGrid() {
+    for (let x = 0; x < size; x++) {
+        tiles[x] = new Array(size);
+        for (let y = 0; y < size; y++) {
+            tiles[x][y] = null;
+        }
+    }
 }
 
 function getVertex(x, y) {
@@ -203,7 +251,7 @@ function isTileClaimed(vert) {
         const x = vert.x / tileSize;
         const y = vert.y / tileSize;
         if(x < size && y < size) {
-            if(tiles[x][y].tileType != null) {
+            if(tiles[x][y] && tiles[x][y].tileType != null) {
                 return true;
             }
         }
@@ -214,7 +262,9 @@ function isTileClaimed(vert) {
 function resetCheckValues() {
     for(let i = 0; i < size; i++) {
         for(let j = 0; j < size; j++) {
-            tiles[i][j].isChecked = false;
+            if(tiles[i][j]) {
+                tiles[i][j].isChecked = false;
+            }
         }
     }
 }

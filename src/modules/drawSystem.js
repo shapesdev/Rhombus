@@ -48,15 +48,20 @@ export function setPosition(e) {
 export function drawGrid() {
     for(let i = 0; i < size; i++) {
         for(let j = 0; j < size; j++) {
-            tiles[i][j].path = canvas.drawPath2D(ctx, i * tileSize, j * tileSize, tileSize, tileSize);
-            if(tiles[i][j].tileType != null) {
-                canvas.colorPath2D(ctx, tiles[i][j].path, tiles[i][j].tileType);
+            if(tiles.length > 0 && tiles[i][j]) {
+                tiles[i][j].path = canvas.drawPath2D(ctx, i * tileSize, j * tileSize, tileSize, tileSize);
+                if(tiles[i][j].tileType) {
+                    canvas.colorPath2D(ctx, tiles[i][j].path, tiles[i][j].tileType);
+                }
             }
-/*             else if(totalLegalMoves == 0) {
-                canvas.colorPath2D(ctx, tiles[i][j].path, 'rgba(230, 120, 143, 0.9)');
-            } */
         }
     }
+}
+
+export function drawVertices() {
+    vertices.forEach((vert) => {
+        drawPoint(vert.x, vert.y, 10);
+    })
 }
 
 export function isDrawSuccessful() {
@@ -194,4 +199,9 @@ function updateLineColor() {
             lineColor = 'red';
         }
     }
+}
+
+function drawPoint(x, y, size = 1) {
+    ctx.fillStyle = 'red';  // Set the fill color for the point
+    ctx.fillRect(x, y, size, size);  // Fill a rectangle at the specified position
 }
