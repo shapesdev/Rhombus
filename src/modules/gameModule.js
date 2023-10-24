@@ -42,5 +42,4 @@ function initGrid(gridSize, tileSize) {
     generateRhombusGrid();
     //generateSquareGrid();
     drawSystem.drawGrid();
-    drawSystem.drawVertices();
 }

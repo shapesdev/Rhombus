@@ -128,7 +128,8 @@ export function updateConqueredTilesCollection(arr) {
 
 export function isLineValid(x1, x2, y1, y2, dir) {
     const mid = getVertex(x1 + tileSize * 2 * dir.x, y1 + tileSize * 2 * dir.y);
-    return !isIntersecting(x1, x2, y1, y2) && !isTileClaimed(mid);
+    const end = getVertex(x1 + tileSize * 3 * dir.x, y1 + tileSize * 3 * dir.y);
+    return end && !isIntersecting(x1, x2, y1, y2) && !isTileClaimed(mid);
 }
 
 function initGrid() {
