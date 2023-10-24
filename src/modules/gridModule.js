@@ -53,7 +53,7 @@ export function generateRhombusGrid() {
     let mid = Math.floor(size / 2);
     let startIndex = mid;
     let tileCount = 1;
-    for (let y = 0; y < size; y++) {
+    for (let y = 0; y <= size; y++) {
         for(let i = 0, x = startIndex; i < tileCount; i++, x++) {
             tiles[x][y] = new Tile(x, y);
             if(i > 0 && tileCount != 1) {
@@ -66,7 +66,6 @@ export function generateRhombusGrid() {
                     edges.push(new Edge(x, y, 'N', tiles[x][y], tiles[x][y - 1]));
                 }
             }
-
              if(y > 0 && x > 0 && (i != 0 && y != 0)) {
                 const v1 = new Vertex(x * tileSize, y * tileSize);
                 const v2 = new Vertex(x * tileSize, (y + 1) * tileSize); 
@@ -79,7 +78,7 @@ export function generateRhombusGrid() {
                 }
             }
         }
-        if(y <= startIndex + 1) {
+        if(y < mid) {
             tileCount += 2;
             startIndex--;
         }
