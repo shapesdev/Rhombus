@@ -1,6 +1,6 @@
-import { lines } from './lineHandler.js';
-import * as canvas from './canvas.js';
-import { size, tiles, tileSize, totalLegalMoves, directionMap, vertices, isLineValid, updateGrid } from './grid.js';
+import { lines } from './lineModule.js';
+import * as canvas from './canvasModule.js';
+import * as grid from './gridModule.js';
 
 const { canvasElem, ctx } = canvas.create(700, 700);
 
@@ -13,8 +13,14 @@ let drawing = false;
 let direction = '';
 let lineColor = 'black';
 
+export function setupCanvas(height, width, tileSize) {
+    canvasElem.height = height;
+    canvasElem.width = width;
+    maxLineLength = 3 * tileSize;
+}
+
 export function draw(e) {
-    if(e.buttons !== 1 || totalLegalMoves == 0) return;
+    if(e.buttons !== 1 || grid.totalLegalMoves == 0) return;
     setDirection(e);
     setStartPoint(e);
     setPosition(e);
@@ -46,12 +52,12 @@ export function setPosition(e) {
 }
 
 export function drawGrid() {
-    for(let i = 0; i < size; i++) {
-        for(let j = 0; j < size; j++) {
-            if(tiles.length > 0 && tiles[i][j]) {
-                tiles[i][j].path = canvas.drawPath2D(ctx, i * tileSize, j * tileSize, tileSize, tileSize);
-                if(tiles[i][j].tileType) {
-                    canvas.colorPath2D(ctx, tiles[i][j].path, tiles[i][j].tileType);
+    for(let i = 0; i < grid.size; i++) {
+        for(let j = 0; j < grid.size; j++) {
+            if(grid.tiles.length > 0 && grid.tiles[i][j]) {
+                grid.tiles[i][j].path = canvas.drawPath2D(ctx, i * grid.tileSize, j * grid.tileSize, grid.tileSize, grid.tileSize);
+                if(grid.tiles[i][j].tileType) {
+                    canvas.colorPath2D(ctx, grid.tiles[i][j].path, grid.tiles[i][j].tileType);
                 }
             }
         }
@@ -59,7 +65,7 @@ export function drawGrid() {
 }
 
 export function drawVertices() {
-    vertices.forEach((vert) => {
+    grid.vertices.forEach((vert) => {
         drawPoint(vert.x, vert.y, 10);
     })
 }
@@ -72,8 +78,8 @@ export function isDrawSuccessful() {
         end: {...curLine},
     };
 
-    if(direction in directionMap) {
-        const dir = directionMap[direction];
+    if(direction in grid.directionMap) {
+        const dir = grid.directionMap[direction];
         let length;
 
         if(dir.x !== 0) {
@@ -84,11 +90,11 @@ export function isDrawSuccessful() {
         }
 
         if(length > 0.85 && line.end.x <= canvasElem.width && line.end.y <= canvasElem.height
-        && line.end.x >= 0 && line.end.y >= 0 && isLineValid(line.start.x, line.end.x, line.start.y, line.end.y, dir)) {          
+        && line.end.x >= 0 && line.end.y >= 0 && grid.isLineValid(line.start.x, line.end.x, line.start.y, line.end.y, dir)) {          
      
             line.end.x = line.start.x + maxLineLength * dir.x;
             line.end.y = line.start.y + maxLineLength * dir.y;
-            updateGrid(line, dir);
+            grid.updateGrid(line, dir);
             success = true;
         }
         else {
@@ -155,7 +161,7 @@ function setStartPoint(e) {
         let minDistance = 1000000;
         let closestPoint;
 
-        vertices.forEach((point) => {
+        grid.vertices.forEach((point) => {
             let distance = Math.sqrt(Math.pow((x - point.x), 2) +
             Math.pow((y - point.y), 2));
             if(distance < minDistance) {
@@ -189,10 +195,10 @@ function updateLineColor() {
         end: {...curLine},
     };
 
-    const dir = directionMap[direction];
+    const dir = grid.directionMap[direction];
 
     if(dir) {
-        if(isLineValid(line.start.x, line.end.x, line.start.y, line.end.y, dir)) {       
+        if(grid.isLineValid(line.start.x, line.end.x, line.start.y, line.end.y, dir)) {       
             lineColor = 'black';
         }
         else {

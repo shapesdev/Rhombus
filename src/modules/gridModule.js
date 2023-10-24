@@ -1,5 +1,5 @@
-import { updateLines, isIntersecting } from "./lineHandler.js";
-import { isPathPossible } from "./pathfinding.js";
+import { updateLines, isIntersecting } from "./lineModule.js";
+import { isPathPossible } from "./pathfindingModule.js";
 import { Tile } from "../classes/Tile.js";
 import { Edge } from "../classes/edge.js";
 import { Vertex } from "../classes/vertex.js";
@@ -19,6 +19,11 @@ const directionMap = {
     S: {x: 0, y: 1},
     W: {x: -1, y: 0},
 };
+
+export function setupGrid(gridSize, tilesSize) {
+    size = gridSize;
+    tileSize = tilesSize;
+}
 
 export function generateSquareGrid() {
     initGrid();
@@ -76,7 +81,6 @@ export function generateRhombusGrid() {
             startIndex++;
         }
     }
-    console.log(edges.length);
     updateLegalMoves();
 }
 

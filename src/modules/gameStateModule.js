@@ -1,12 +1,12 @@
-import { setTilePaths, conqueredTiles, totalLegalMoves, updateLegalMoves, tiles, updateConqueredTilesCollection } from "./grid.js";
-
-export {players, current};
+import { setTilePaths, conqueredTiles, totalLegalMoves, updateLegalMoves, tiles, updateConqueredTilesCollection } from "./gridModule.js";
 
 let current = null;
 let players = [];
 
-export function initStartingPlayer(player) {
-    current = player;
+export function addPlayers(player1, player2) {
+    players.push(player1);
+    players.push(player2);
+    current = player1;
 }
 
 export function handleTileConquer() {
