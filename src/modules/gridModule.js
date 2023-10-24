@@ -68,8 +68,15 @@ export function generateRhombusGrid() {
             }
 
              if(y > 0 && x > 0 && (i != 0 && y != 0)) {
-                vertices.push(new Vertex(x * tileSize, y * tileSize));
-                vertices.push(new Vertex(x * tileSize, (y + 1) * tileSize));
+                const v1 = new Vertex(x * tileSize, y * tileSize);
+                const v2 = new Vertex(x * tileSize, (y + 1) * tileSize); 
+                if (!vertices.some(vert => vert.x === v1.x && vert.y === v1.y)) {
+                  vertices.push(v1);
+                }
+                
+                if (!vertices.some(vert => vert.x === v2.x && vert.y === v2.y)) {
+                  vertices.push(v2);
+                }
             }
         }
         if(y <= startIndex + 1) {
@@ -133,7 +140,7 @@ function initGrid() {
     }
 }
 
-function getVertex(x, y) {
+export function getVertex(x, y) {
     return vertices.find(p => p.x == x && p.y == y);
 }
 

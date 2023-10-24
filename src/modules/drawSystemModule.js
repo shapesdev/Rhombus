@@ -23,6 +23,10 @@ export function draw(e) {
     if(e.buttons !== 1 || grid.totalLegalMoves == 0) return;
     setDirection(e);
     setStartPoint(e);
+    if(grid.getVertex(startPoint.x, startPoint.y).moves == 0) {
+        console.warn('No drawing here');
+        return;
+    }
     setPosition(e);
     limitLineLength();
     updateLineColor();
