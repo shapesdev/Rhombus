@@ -39,8 +39,8 @@ function initPlayers() {
 
 function initGrid(gridSize, tileSize) {
     setupGrid(gridSize, tileSize);
-    generateRhombusGrid();
-    //generateSquareGrid();
+    //generateRhombusGrid();
+    generateSquareGrid();
     drawSystem.drawGrid();
     //drawSystem.drawVertices();
 }
